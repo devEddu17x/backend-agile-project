@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
-export class CreateEmployeeDTO {
+export class UpdateEmployeeDTO {
   @IsString()
   @IsNotEmpty()
   @MaxLength(100)
@@ -14,5 +14,5 @@ export class CreateEmployeeDTO {
   @IsString()
   @IsNotEmpty()
   @MaxLength(50)
-  reference: string;
+  email: string;
 }
