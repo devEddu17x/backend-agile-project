@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: dumi_password
       POSTGRES_DB: dumi_db
     ports:
-      - 5433:5433
+      - 5433:5432
     networks:
       - app_network
     restart: unless-stopped
