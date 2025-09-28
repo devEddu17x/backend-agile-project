@@ -4,7 +4,6 @@ import { ConfigService } from '@nestjs/config';
 export function buildSessionRecipe(deps: { config: ConfigService }) {
   const { config } = deps;
 
-  // opcional: leer desde env/config
   const cookieDomain = config.get<string>('auth.cookieDomain') ?? 'localhost';
   const cookieSameSite =
     (config.get<string>('auth.cookieSameSite') as 'lax' | 'strict' | 'none') ??
