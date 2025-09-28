@@ -19,6 +19,7 @@ import { CustomerModule } from './customer/customer.module';
     AuthModule,
     CustomerModule,
   ],
+
   controllers: [AppController],
   providers: [AppService],
 })
