@@ -3,9 +3,9 @@ import { ConfigService } from '@nestjs/config';
 import { EmployeeModule } from 'src/employee/employee.module';
 import { EmployeeService } from 'src/employee/employee.service';
 import { SuperTokensModule } from 'supertokens-nestjs';
-import EmailPassword from 'supertokens-node/recipe/emailpassword';
-import Session from 'supertokens-node/recipe/session';
 import UserRoles from 'supertokens-node/recipe/userroles';
+import { buildEmailPasswordRecipe } from './recipes/email-password.recipe';
+import { buildSessionRecipe } from './recipes/session.recipe';
 @Module({
   imports: [
     SuperTokensModule.forRootAsync({
@@ -17,29 +17,8 @@ import UserRoles from 'supertokens-node/recipe/userroles';
       ) => ({
         ...configService.get('supertokens'),
         recipeList: [
-          EmailPassword.init({
-            override: {
-              functions: (orig) => ({
-                ...orig,
-                signUp: async (input) => {
-                  const res = await orig.signUp(input);
-                  if (res.status === 'OK') {
-                    await employeeService.createEmployee({
-                      email: res.user.emails[0],
-                    });
-                  }
-                  // TODO!:delete user if could not create employee
-                  return res;
-                },
-              }),
-            },
-          }),
-          Session.init({
-            getTokenTransferMethod: () => 'cookie',
-            cookieDomain: 'localhost',
-            cookieSameSite: 'lax',
-            cookieSecure: false,
-          }),
+          buildEmailPasswordRecipe({ employeeService }),
+          buildSessionRecipe({ config: configService }),
           UserRoles.init(),
         ],
       }),
