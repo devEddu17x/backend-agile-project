@@ -1,7 +1,6 @@
 services:
   # Note: If you are assigning a custom name to your db service on the line below, make sure it does not contain underscores
 
-
   # application database
   app_db:
     image: 'postgres:latest'
@@ -14,7 +13,7 @@ services:
     networks:
       - app_network
     restart: unless-stopped
-  
+
   # supertokens core database
   db:
     image: 'postgres:latest'
@@ -28,7 +27,15 @@ services:
       - app_network
     restart: unless-stopped
     healthcheck:
-      test: ['CMD', 'pg_isready', '-U', 'supertokens_user', '-d', 'supertokens']
+      test:
+        [
+          'CMD',
+          'pg_isready',
+          '-U',
+          'dumi_super_token_user',
+          '-d',
+          'supertokens',
+        ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -41,7 +48,7 @@ services:
     ports:
       - 3567:3567
     environment:
-      POSTGRESQL_CONNECTION_URI: "postgresql://dumi_super_token_user:dumi_password@db:5432/supertokens"
+      POSTGRESQL_CONNECTION_URI: 'postgresql://dumi_super_token_user:dumi_password@db:5432/supertokens'
     networks:
       - app_network
     restart: unless-stopped
