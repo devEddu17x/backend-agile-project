@@ -20,8 +20,8 @@ export class CustomerEntity {
   @Column({ type: 'varchar', length: 100, nullable: false })
   reference: string;
 
-  @Column({ nullable: false })
-  phone: number;
+  @Column({ type: 'varchar', length: 20, nullable: false })
+  phone: string;
 
   @CreateDateColumn()
   createdAt: Date;
