@@ -24,7 +24,9 @@ export class EmployeeService {
       });
       return await this.employeeRepository.save(employee);
     } catch (error) {
-      console.log(error);
+      if (error.code === '23505') {
+        throw new BadRequestException('Employee email already exists');
+      }
       throw new BadRequestException('Could not create employee');
     }
   }
