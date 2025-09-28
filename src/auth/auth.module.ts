@@ -15,4 +15,4 @@ import UserRoles from 'supertokens-node/recipe/userroles';
     }),
   ],
 })
-export class AuthModule { }
+export class AuthModule {}
