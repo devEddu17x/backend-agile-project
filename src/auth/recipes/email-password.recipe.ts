@@ -3,6 +3,7 @@ import { EmployeeService } from 'src/employee/employee.service';
 import SuperTokens from 'supertokens-node';
 import { BadRequestException } from '@nestjs/common';
 import UserMetadata from 'supertokens-node/recipe/usermetadata';
+import { APP_USER_ID_METADATA_KEY } from '../constants/app-user-id-key';
 
 export function buildEmailPasswordRecipe(dependencies: {
   employeeService: EmployeeService;
@@ -32,7 +33,7 @@ export function buildEmailPasswordRecipe(dependencies: {
 
           if (res.status === 'OK' && appUser) {
             await UserMetadata.updateUserMetadata(res.user.id, {
-              appUserId: appUser.id,
+              [APP_USER_ID_METADATA_KEY]: appUser.id,
             });
           }
           return res;

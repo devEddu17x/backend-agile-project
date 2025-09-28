@@ -1,8 +1,9 @@
 import Session from 'supertokens-node/recipe/session';
 import { ConfigService } from '@nestjs/config';
+import { AppUserIdClaim } from '../claims/app-user-id.claim';
 
-export function buildSessionRecipe(deps: { config: ConfigService }) {
-  const { config } = deps;
+export function buildSessionRecipe(dependencies: { config: ConfigService }) {
+  const { config } = dependencies;
 
   const cookieDomain = config.get<string>('auth.cookieDomain') ?? 'localhost';
   const cookieSameSite =
@@ -15,5 +16,15 @@ export function buildSessionRecipe(deps: { config: ConfigService }) {
     cookieDomain,
     cookieSameSite,
     cookieSecure,
+    override: {
+      functions: (original) => ({
+        ...original,
+        async createNewSession(input) {
+          const session = await original.createNewSession(input);
+          await session.fetchAndSetClaim(AppUserIdClaim, input.userContext);
+          return session;
+        },
+      }),
+    },
   });
 }
