@@ -2,6 +2,7 @@ import EmailPassword from 'supertokens-node/recipe/emailpassword';
 import { EmployeeService } from 'src/employee/employee.service';
 import SuperTokens from 'supertokens-node';
 import { BadRequestException } from '@nestjs/common';
+import UserMetadata from 'supertokens-node/recipe/usermetadata';
 
 export function buildEmailPasswordRecipe(dependencies: {
   employeeService: EmployeeService;
@@ -13,19 +14,25 @@ export function buildEmailPasswordRecipe(dependencies: {
       functions: (orig) => ({
         ...orig,
         async signUp(input) {
-          const res = await orig.signUp(input);
-          let appUser = null;
-          if (res.status === 'OK') {
-            appUser = await employeeService.createEmployee({
-              email: res.user.emails[0],
-            });
-            if (!appUser) {
-              await SuperTokens.deleteUser(res.user.id);
-              throw new BadRequestException('Could not create user');
-            }
-            await SuperTokens.createUserIdMapping({
-              superTokensUserId: res.user.id,
-              externalUserId: appUser.id,
+          const [res, appUser] = await Promise.all([
+            orig.signUp(input),
+            employeeService.createEmployee({
+              email: input.email,
+            }),
+          ]);
+
+          if (!appUser && res.status === 'OK') {
+            SuperTokens.deleteUser(res.user.id);
+            throw new BadRequestException('Could not create user');
+          }
+
+          if (appUser && res.status !== 'OK') {
+            await employeeService.deleteEmployee(appUser.id);
+          }
+
+          if (res.status === 'OK' && appUser) {
+            await UserMetadata.updateUserMetadata(res.user.id, {
+              appUserId: appUser.id,
             });
           }
           return res;

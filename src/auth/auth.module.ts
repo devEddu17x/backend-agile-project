@@ -6,6 +6,8 @@ import { SuperTokensModule } from 'supertokens-nestjs';
 import UserRoles from 'supertokens-node/recipe/userroles';
 import { buildEmailPasswordRecipe } from './recipes/email-password.recipe';
 import { buildSessionRecipe } from './recipes/session.recipe';
+import UserMetadata from 'supertokens-node/recipe/usermetadata';
+
 @Module({
   imports: [
     SuperTokensModule.forRootAsync({
@@ -20,6 +22,7 @@ import { buildSessionRecipe } from './recipes/session.recipe';
           buildEmailPasswordRecipe({ employeeService }),
           buildSessionRecipe({ config: configService }),
           UserRoles.init(),
+          UserMetadata.init(),
         ],
       }),
     }),
