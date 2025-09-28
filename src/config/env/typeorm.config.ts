@@ -15,7 +15,7 @@ export default registerAs('typeorm', () => {
 
   if (missingVars.length) {
     throw new Error(
-      `Missing required SuperTokens env vars: ${missingVars.join(', ')}`,
+      `Missing required database env vars: ${missingVars.join(', ')}`,
     );
   }
 
@@ -31,6 +31,6 @@ export default registerAs('typeorm', () => {
     password: DB_PASSWORD,
     database: DB_NAME,
     entities: [CustomerEntity],
-    synchronize: true,
+    synchronize: process.env.NODE_ENV !== 'production',
   };
 });
