@@ -12,7 +12,7 @@ enum RESOURCE {
 }
 
 // format: ACTION:RESOURCE
-export const ROLE_DEFS: Record<string, string[]> = {
+export const ROLES: Record<string, string[]> = {
   user: [
     `${ACTION.READ}:${RESOURCE.SELF}`,
     `${ACTION.UPDATE}:${RESOURCE.SELF}`,
