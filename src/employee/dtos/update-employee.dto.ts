@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export class UpdateEmployeeDTO {
   @IsString()
@@ -10,10 +10,4 @@ export class UpdateEmployeeDTO {
   @IsNotEmpty()
   @MaxLength(100)
   lastNames: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @IsEmail()
-  @MaxLength(50)
-  email: string;
 }
