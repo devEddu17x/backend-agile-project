@@ -13,10 +13,10 @@ export class ClothesService {
 
   async create(clothes: CreateClothesDTO) {
     const newClothes = this.clothesRepository.create(clothes);
-    const createdClothes = await this.clothesRepository.save(newClothes);
-    if (!createdClothes) {
+    try {
+      return await this.clothesRepository.save(newClothes);
+    } catch (error) {
       throw new BadRequestException('Error creating the clothes item');
     }
-    return createdClothes;
   }
 }

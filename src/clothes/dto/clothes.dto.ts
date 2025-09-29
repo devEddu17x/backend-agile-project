@@ -1,11 +1,4 @@
-import {
-  IsString,
-  IsNumber,
-  IsNotEmpty,
-  IsOptional,
-  Min,
-  IsEnum,
-} from 'class-validator';
+import { IsString, IsNumber, IsNotEmpty, Min, IsEnum } from 'class-validator';
 import { Gender } from '../enum/gender.enum';
 import { ClothesSize } from '../enum/size.enum';
 
@@ -14,7 +7,7 @@ export class CreateClothesDTO {
   @IsString()
   name: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   description: string;
 
