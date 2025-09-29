@@ -54,6 +54,7 @@ export class EmployeeService {
       await this.employeeRepository.delete(id);
     } catch (error) {
       this.logger.error('Error deleting employee or does not exist');
+      throw new BadRequestException('Could not delete employee');
     }
   }
 }
