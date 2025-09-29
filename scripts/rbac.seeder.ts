@@ -19,6 +19,10 @@ const { EMAIL_ADMIN, EMAIL_EMPLOYEE, ADMIN_PASSWORD, EMPLOYEE_PASSWORD } =
 // SuperTokens configuration
 const { CONNECTION_URI, APP_NAME, API_DOMAIN, WEBSITE_DOMAIN } = process.env;
 
+if (!EMAIL_ADMIN || !EMAIL_EMPLOYEE || !ADMIN_PASSWORD || !EMPLOYEE_PASSWORD) {
+  console.error('Missing seed credentials in environment variables');
+  process.exit(1);
+}
 console.log('Starting RBAC seeder...');
 
 const DumiDataSource = new DataSource({
