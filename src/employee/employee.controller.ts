@@ -1,4 +1,10 @@
-import { Body, Controller, Patch, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Patch,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { UpdateEmployeeDTO } from './dtos/update-employee.dto';
 import {
@@ -20,7 +26,9 @@ export class EmployeeController {
     @Session() session: SessionContainer,
   ): Promise<EmployeeEntity> {
     const appUserId = session.getAccessTokenPayload().appUserId;
-    console.log('appUserId', appUserId);
+    if (!appUserId) {
+      throw new UnauthorizedException('Session missing app user id');
+    }
     return await this.employeeService.updateEmployee(
       appUserId.v,
       updateEmployeeDTO,
