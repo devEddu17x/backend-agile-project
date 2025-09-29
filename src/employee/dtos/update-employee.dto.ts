@@ -1,13 +1,13 @@
-import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class UpdateEmployeeDTO {
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   @MaxLength(100)
-  names: string;
+  names?: string;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   @MaxLength(100)
-  lastNames: string;
+  lastNames?: string;
 }
