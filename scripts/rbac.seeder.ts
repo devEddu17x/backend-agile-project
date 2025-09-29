@@ -2,14 +2,15 @@ import SuperTokens from 'supertokens-node';
 import UserRoles from 'supertokens-node/recipe/userroles';
 import EmailPassword from 'supertokens-node/recipe/emailpassword';
 import Session from 'supertokens-node/recipe/session';
+import UserMetadata from 'supertokens-node/recipe/usermetadata';
 import { DataSource } from 'typeorm';
 import { ROLE_NAMES, ROLES } from '../src/auth/constants/roles';
 import { EmployeeEntity } from '../src/employee/entities/employee.entitiy';
 
 import * as dotenv from 'dotenv';
+import { APP_USER_ID_METADATA_KEY } from '../src/auth/constants/app-user-id-key';
 
 dotenv.config({ path: '.env.local' });
-
 // Database connection configuration
 const { DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME } = process.env;
 // Seed users credentials
@@ -41,7 +42,12 @@ async function main() {
       apiDomain: API_DOMAIN || 'http://localhost:3000',
       websiteDomain: WEBSITE_DOMAIN || 'http://localhost:3001',
     },
-    recipeList: [EmailPassword.init(), Session.init(), UserRoles.init()],
+    recipeList: [
+      EmailPassword.init(),
+      Session.init(),
+      UserRoles.init(),
+      UserMetadata.init(),
+    ],
   });
 
   try {
@@ -89,14 +95,18 @@ async function main() {
           lastNames: 'Last Name',
           email: res.user.emails[0],
         });
-        await Promise.all([
-          await DumiDataSource.getRepository(EmployeeEntity).save(user),
-          await UserRoles.addRoleToUser(
+        const [appUser] = await Promise.all([
+          DumiDataSource.getRepository(EmployeeEntity).save(user),
+          UserRoles.addRoleToUser(
             'public',
             userId,
-            user.email === EMAIL_ADMIN ? ROLE_NAMES.ADMIN : ROLE_NAMES.USER,
+            user.email === EMAIL_ADMIN ? ROLE_NAMES.ADMIN : ROLE_NAMES.SELLER,
           ),
         ]);
+
+        await UserMetadata.updateUserMetadata(userId, {
+          [APP_USER_ID_METADATA_KEY]: appUser.id,
+        });
       }
     }
 
