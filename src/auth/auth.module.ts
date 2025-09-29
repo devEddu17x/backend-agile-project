@@ -1,16 +1,29 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { EmployeeModule } from 'src/employee/employee.module';
+import { EmployeeService } from 'src/employee/employee.service';
 import { SuperTokensModule } from 'supertokens-nestjs';
-import EmailPassword from 'supertokens-node/recipe/emailpassword';
-import Session from 'supertokens-node/recipe/session';
 import UserRoles from 'supertokens-node/recipe/userroles';
+import { buildEmailPasswordRecipe } from './recipes/email-password.recipe';
+import { buildSessionRecipe } from './recipes/session.recipe';
+import UserMetadata from 'supertokens-node/recipe/usermetadata';
+
 @Module({
   imports: [
     SuperTokensModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
+      imports: [EmployeeModule],
+      inject: [ConfigService, EmployeeService],
+      useFactory: (
+        configService: ConfigService,
+        employeeService: EmployeeService,
+      ) => ({
         ...configService.get('supertokens'),
-        recipeList: [EmailPassword.init(), Session.init(), UserRoles.init()],
+        recipeList: [
+          buildEmailPasswordRecipe({ employeeService }),
+          buildSessionRecipe({ config: configService }),
+          UserRoles.init(),
+          UserMetadata.init(),
+        ],
       }),
     }),
   ],

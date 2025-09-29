@@ -6,7 +6,11 @@ import * as config from './env';
     NestConfigModule.forRoot({
       envFilePath: ['.env.local', '.env'],
       isGlobal: true,
-      load: [config.supertokensConfig, config.typeormConfig],
+      load: [
+        config.supertokensConfig,
+        config.typeormConfig,
+        config.cookieConfig,
+      ],
     }),
   ],
 })
