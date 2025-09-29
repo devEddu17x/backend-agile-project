@@ -3,7 +3,7 @@ import UserRoles from 'supertokens-node/recipe/userroles';
 import EmailPassword from 'supertokens-node/recipe/emailpassword';
 import Session from 'supertokens-node/recipe/session';
 import { DataSource } from 'typeorm';
-import { ROLES } from '../src/auth/constants/roles';
+import { ROLE_NAMES, ROLES } from '../src/auth/constants/roles';
 import { EmployeeEntity } from '../src/employee/entities/employee.entitiy';
 
 import * as dotenv from 'dotenv';
@@ -83,12 +83,20 @@ async function main() {
       if (res.status === 'OK') {
         const userId = res.user.id;
         if (!userId) throw new Error('No user id returned by SuperTokens');
+
         const user = DumiDataSource.getRepository(EmployeeEntity).create({
           names: 'Seed User',
           lastNames: 'Last Name',
           email: res.user.emails[0],
         });
-        await DumiDataSource.getRepository(EmployeeEntity).save(user);
+        await Promise.all([
+          await DumiDataSource.getRepository(EmployeeEntity).save(user),
+          await UserRoles.addRoleToUser(
+            'public',
+            userId,
+            user.email === EMAIL_ADMIN ? ROLE_NAMES.ADMIN : ROLE_NAMES.USER,
+          ),
+        ]);
       }
     }
 
