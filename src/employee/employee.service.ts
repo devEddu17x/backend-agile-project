@@ -35,12 +35,18 @@ export class EmployeeService {
     id: string,
     updateEmployeeDTO: UpdateEmployeeDTO,
   ): Promise<EmployeeEntity> {
-    try {
-      await this.employeeRepository.update(id, updateEmployeeDTO);
-      return await this.employeeRepository.findOneBy({ id });
-    } catch (error) {
-      throw new BadRequestException('Could not update employee');
+    if (!id)
+      throw new BadRequestException(
+        'Employee id is required. Verify your session',
+      );
+    const response = await this.employeeRepository.update(
+      id,
+      updateEmployeeDTO,
+    );
+    if (response.affected === 0) {
+      throw new BadRequestException('Employee not found');
     }
+    return await this.employeeRepository.findOneBy({ id });
   }
 
   async deleteEmployee(id: string): Promise<void> {
