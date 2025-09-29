@@ -51,10 +51,15 @@ export class EmployeeService {
 
   async deleteEmployee(id: string): Promise<void> {
     try {
-      await this.employeeRepository.delete(id);
+      const result = await this.employeeRepository.delete(id);
+      if (result.affected === 0) {
+        throw new BadRequestException('Employee not found');
+      }
     } catch (error) {
       this.logger.error('Error deleting employee or does not exist');
-      throw new BadRequestException('Could not delete employee');
+      throw new BadRequestException(
+        'Error deleting employee or does not exist',
+      );
     }
   }
 }
