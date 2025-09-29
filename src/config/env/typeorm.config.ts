@@ -1,4 +1,5 @@
 import { registerAs } from '@nestjs/config';
+import { ClothesEntity } from 'src/clothes/entities/clothes.entity';
 import { CustomerEntity } from 'src/customer/entities/customer.entity';
 import { EmployeeEntity } from 'src/employee/entities/employee.entitiy';
 
@@ -31,7 +32,7 @@ export default registerAs('typeorm', () => {
     username: DB_USERNAME,
     password: DB_PASSWORD,
     database: DB_NAME,
-    entities: [CustomerEntity, EmployeeEntity],
+    entities: [CustomerEntity, EmployeeEntity, ClothesEntity],
     synchronize: process.env.NODE_ENV !== 'production',
   };
 });

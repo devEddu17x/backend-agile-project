@@ -17,8 +17,6 @@ export class ClothesService {
     if (!createdClothes) {
       throw new BadRequestException('Error creating the clothes item');
     }
-    if (!createdClothes) {
-      throw new BadRequestException('Error creating the clothes item');
-    }
+    return createdClothes;
   }
 }

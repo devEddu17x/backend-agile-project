@@ -16,16 +16,16 @@ export class ClothesEntity {
   @Column({ type: 'varchar', length: 120, nullable: false })
   name: string;
 
-  @Column({ type: 'text', length: 500, nullable: false })
+  @Column({ type: 'text', nullable: false })
   description: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
   price: number;
 
-  @Column({ type: 'enum', enum: Gender, length: 10, nullable: true })
+  @Column({ type: 'enum', enum: Gender, nullable: true })
   genre: string;
 
-  @Column({ type: 'enum', enum: ClothesSize, length: 10, nullable: false })
+  @Column({ type: 'enum', enum: ClothesSize, nullable: false })
   size: string;
 
   @CreateDateColumn()
