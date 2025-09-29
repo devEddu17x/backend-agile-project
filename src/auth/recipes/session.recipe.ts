@@ -5,12 +5,13 @@ import { AppUserIdClaim } from '../claims/app-user-id.claim';
 export function buildSessionRecipe(dependencies: { config: ConfigService }) {
   const { config } = dependencies;
 
-  const cookieDomain = config.get<string>('auth.cookieDomain') ?? 'localhost';
+  const cookieDomain = config.get<string>('cookie.cookieDomain');
   const cookieSameSite =
-    (config.get<string>('auth.cookieSameSite') as 'lax' | 'strict' | 'none') ??
-    'lax';
-  const cookieSecure = config.get<boolean>('auth.cookieSecure') ?? false;
-
+    (config.get<string>('cookie.cookieSameSite') as
+      | 'lax'
+      | 'strict'
+      | 'none') ?? 'lax';
+  const cookieSecure = config.get<boolean>('cookie.cookieSecure') ?? false;
   return Session.init({
     getTokenTransferMethod: () => 'cookie',
     cookieDomain,
