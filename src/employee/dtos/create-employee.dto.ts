@@ -6,4 +6,19 @@ export class CreateEmployeeDTO {
   @IsNotEmpty()
   @MaxLength(50)
   email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(100)
+  names: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(100)
+  lastNames: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(100)
+  password: string;
 }

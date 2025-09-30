@@ -13,7 +13,7 @@ import {
   VerifySession,
 } from 'supertokens-nestjs';
 import { SessionContainer } from 'supertokens-node/recipe/session';
-import { EmployeeEntity } from './entities/employee.entitiy';
+import { EmployeeEntity } from './entities/employee.entity';
 @UseGuards(SuperTokensAuthGuard)
 @Controller('employee')
 export class EmployeeController {

@@ -1,10 +1,11 @@
 import { registerAs } from '@nestjs/config';
 import { ClothesEntity } from 'src/clothes/entities/clothes.entity';
 import { CustomerEntity } from 'src/customer/entities/customer.entity';
-import { EmployeeEntity } from 'src/employee/entities/employee.entitiy';
+import { EmployeeEntity } from 'src/employee/entities/employee.entity';
 
 export default registerAs('typeorm', () => {
-  const { DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME } = process.env;
+  const { DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME, DB_SSL } =
+    process.env;
 
   const missingVars = [
     ['DB_HOST', DB_HOST],
@@ -34,9 +35,13 @@ export default registerAs('typeorm', () => {
     database: DB_NAME,
     entities: [CustomerEntity, EmployeeEntity, ClothesEntity],
     synchronize: process.env.NODE_ENV !== 'production',
-    ssl: {
-      rejectUnauthorized: false,
-    },
+    ssl:
+      DB_SSL === 'true'
+        ? {
+            require: true,
+            rejectUnauthorized: false,
+          }
+        : false,
     uuidExtension: 'pgcrypto',
   };
 });

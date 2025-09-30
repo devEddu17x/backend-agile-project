@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { CustomerModule } from './customer/customer.module';
 import { EmployeeModule } from './employee/employee.module';
 import { ClothesModule } from './clothes/clothes.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ClothesModule } from './clothes/clothes.module';
     CustomerModule,
     EmployeeModule,
     ClothesModule,
+    AdminModule,
   ],
 
   controllers: [AppController],
