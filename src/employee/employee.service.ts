@@ -80,6 +80,14 @@ export class EmployeeService {
     return { message: `Role ${role} assigned to user ${appUserId}` };
   }
 
+  async revokeEmployeeRole(appUserId: string, role: ROLE_NAMES) {
+    const response = await UserRoles.removeUserRole('public', appUserId, role);
+    if (response.status !== 'OK') {
+      throw new BadRequestException('Could not revoke user role');
+    }
+    return { message: `Role ${role} revoked from user ${appUserId}` };
+  }
+
   async getAllEmployees(): Promise<EmployeeEntity[]> {
     const employees = await this.employeeRepository.find();
     if (!employees || employees.length === 0) {

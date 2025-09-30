@@ -61,6 +61,21 @@ export class AdminService {
     return await this.employeeService.updateEmployeeRole(appUserId, role);
   }
 
+  async revokeEmployeeRole(email: string, role: ROLE_NAMES) {
+    const userResponse: User[] = await SuperTokens.listUsersByAccountInfo(
+      'public',
+      {
+        email,
+      },
+    );
+
+    if (userResponse.length === 0) {
+      throw new NotFoundException('User not found');
+    }
+    const appUserId = userResponse[0].id;
+    return await this.employeeService.revokeEmployeeRole(appUserId, role);
+  }
+
   async getAllEmployees(): Promise<EmployeeWithRoles[]> {
     // getting all employees and roles
     const employees: EmployeeEntity[] =

@@ -47,6 +47,21 @@ export class AdminController {
   @VerifySession({
     roles: [ROLE_NAMES.ADMIN],
   })
+  @Patch('employees/revoke')
+  async revokeEmployeeRole(@Body() promoteEmployeeDTO: PromoteEmployeeDTO) {
+    try {
+      return await this.adminService.revokeEmployeeRole(
+        promoteEmployeeDTO.email,
+        promoteEmployeeDTO.role,
+      );
+    } catch (error) {
+      throw new ConflictException('Could not update employee role');
+    }
+  }
+
+  @VerifySession({
+    roles: [ROLE_NAMES.ADMIN],
+  })
   @Post('employees')
   async createEmployee(@Body() createEmployeeDTO: CreateEmployeeDTO) {
     return await this.adminService.createEmployee(createEmployeeDTO);
