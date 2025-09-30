@@ -20,7 +20,7 @@ export class EmployeeEntity {
   @Column({ type: 'varchar', length: 50, nullable: false, unique: true })
   email: string;
 
-  @Column({ type: 'varchar', length: 36, nullable: false, unique: true })
+  @Column({ type: 'varchar', length: 128, nullable: false, unique: true })
   superTokensId: string;
 
   @CreateDateColumn()
