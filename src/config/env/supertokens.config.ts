@@ -2,12 +2,14 @@ import { registerAs } from '@nestjs/config';
 
 export default registerAs('supertokens', () => {
   // api key will be used later
-  const { CONNECTION_URI, APP_NAME, API_DOMAIN, WEBSITE_DOMAIN } = process.env;
+  const { CONNECTION_URI, APP_NAME, API_DOMAIN, WEBSITE_DOMAIN, API_KEY } =
+    process.env;
   const missingVars = [
     ['CONNECTION_URI', CONNECTION_URI],
     ['APP_NAME', APP_NAME],
     ['API_DOMAIN', API_DOMAIN],
     ['WEBSITE_DOMAIN', WEBSITE_DOMAIN],
+    ['API_KEY', API_KEY],
   ]
     .filter(([, value]) => !value)
     .map(([name]) => name);
@@ -22,6 +24,7 @@ export default registerAs('supertokens', () => {
     framework: 'express',
     supertokens: {
       connectionURI: CONNECTION_URI,
+      apiKey: API_KEY,
     },
     appInfo: {
       appName: APP_NAME,
