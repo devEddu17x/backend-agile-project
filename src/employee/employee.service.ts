@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EmployeeEntity } from './entities/employee.entitiy';
 import { Repository } from 'typeorm/repository/Repository';
@@ -74,5 +78,13 @@ export class EmployeeService {
       throw new BadRequestException('Could not update user role');
     }
     return { message: `Role ${role} assigned to user ${appUserId}` };
+  }
+
+  async getAllEmployees(): Promise<EmployeeEntity[]> {
+    const employees = await this.employeeRepository.find();
+    if (!employees || employees.length === 0) {
+      throw new NotFoundException('No employees found');
+    }
+    return employees;
   }
 }
