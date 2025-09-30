@@ -10,16 +10,23 @@ import { EmployeeEntity } from '../src/employee/entities/employee.entitiy';
 import * as dotenv from 'dotenv';
 import { APP_USER_ID_METADATA_KEY } from '../src/auth/constants/app-user-id-key';
 
-dotenv.config({ path: '.env.local' });
+dotenv.config({ path: '.env' });
 // Database connection configuration
 const { DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME } = process.env;
 // Seed users credentials
 const { EMAIL_ADMIN, EMAIL_EMPLOYEE, ADMIN_PASSWORD, EMPLOYEE_PASSWORD } =
   process.env;
 // SuperTokens configuration
-const { CONNECTION_URI, APP_NAME, API_DOMAIN, WEBSITE_DOMAIN } = process.env;
+const { CONNECTION_URI, APP_NAME, API_DOMAIN, WEBSITE_DOMAIN, API_KEY } =
+  process.env;
 
-if (!EMAIL_ADMIN || !EMAIL_EMPLOYEE || !ADMIN_PASSWORD || !EMPLOYEE_PASSWORD) {
+if (
+  !EMAIL_ADMIN ||
+  !EMAIL_EMPLOYEE ||
+  !ADMIN_PASSWORD ||
+  !EMPLOYEE_PASSWORD ||
+  !API_KEY
+) {
   console.error('Missing seed credentials in environment variables');
   process.exit(1);
 }
@@ -40,7 +47,10 @@ const DumiDataSource = new DataSource({
 async function main() {
   SuperTokens.init({
     framework: 'express',
-    supertokens: { connectionURI: CONNECTION_URI || 'http://localhost:3567' },
+    supertokens: {
+      connectionURI: CONNECTION_URI || 'http://localhost:3567',
+      apiKey: API_KEY,
+    },
     appInfo: {
       appName: APP_NAME || 'DUMI',
       apiDomain: API_DOMAIN || 'http://localhost:3000',
