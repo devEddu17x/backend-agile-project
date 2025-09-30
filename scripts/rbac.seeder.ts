@@ -10,15 +10,22 @@ import { EmployeeEntity } from '../src/employee/entities/employee.entitiy';
 import * as dotenv from 'dotenv';
 import { APP_USER_ID_METADATA_KEY } from '../src/auth/constants/app-user-id-key';
 
-dotenv.config({ path: '.env' });
+dotenv.config({ path: '.env.seed' });
 // Database connection configuration
-const { DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME } = process.env;
+const { DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME, DB_SSL } =
+  process.env;
 // Seed users credentials
 const { EMAIL_ADMIN, EMAIL_EMPLOYEE, ADMIN_PASSWORD, EMPLOYEE_PASSWORD } =
   process.env;
 // SuperTokens configuration
 const { CONNECTION_URI, APP_NAME, API_DOMAIN, WEBSITE_DOMAIN, API_KEY } =
   process.env;
+const ssl =
+  DB_SSL === 'true'
+    ? {
+        ssl: { rejectUnauthorized: false },
+      }
+    : {};
 
 if (
   !EMAIL_ADMIN ||
@@ -42,6 +49,7 @@ const DumiDataSource = new DataSource({
   entities: [EmployeeEntity],
   synchronize: true,
   logging: true,
+  ...ssl,
 });
 
 async function main() {
