@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseUUIDPipe,
   Patch,
   Post,
   UseGuards,
@@ -68,7 +67,7 @@ export class AdminController {
     roles: [ROLE_NAMES.ADMIN],
   })
   @Delete('employees/:superTokenId')
-  async deleteEmployee(@Param('superTokenId', ParseUUIDPipe) id: string) {
+  async deleteEmployee(@Param('superTokenId') id: string) {
     return await this.adminService.deleteEmployee(id);
   }
 }

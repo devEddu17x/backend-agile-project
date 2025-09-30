@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ROLE_NAMES } from 'src/auth/constants/roles';
 import { EmployeeService } from 'src/employee/employee.service';
 import UserRoles from 'supertokens-node/recipe/userroles';
@@ -22,7 +27,7 @@ export class AdminService {
 
   async createEmployee(
     createEmployeeDTO: CreateEmployeeDTO,
-  ): Promise<EmployeeEntity | { status: string }> {
+  ): Promise<EmployeeEntity> {
     const stRes = await EmailPassword.signUp(
       'public',
       createEmployeeDTO.email,
@@ -30,7 +35,10 @@ export class AdminService {
     );
 
     if (stRes.status !== 'OK') {
-      return stRes;
+      if (stRes.status === 'EMAIL_ALREADY_EXISTS_ERROR') {
+        throw new ConflictException('Email already exists');
+      }
+      throw new BadRequestException('Sign up failed');
     }
 
     let employee = null;
