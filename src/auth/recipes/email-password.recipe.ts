@@ -5,6 +5,8 @@ import { BadRequestException } from '@nestjs/common';
 import UserMetadata from 'supertokens-node/recipe/usermetadata';
 import { APP_USER_ID_METADATA_KEY } from '../constants/app-user-id-key';
 import { EmployeeEntity } from 'src/employee/entities/employee.entitiy';
+import UserRoles from 'supertokens-node/recipe/userroles';
+import { ROLE_NAMES } from '../constants/roles';
 
 export function buildEmailPasswordRecipe(dependencies: {
   employeeService: EmployeeService;
@@ -26,6 +28,12 @@ export function buildEmailPasswordRecipe(dependencies: {
             appUser = await employeeService.createEmployee({
               email: input.email,
             });
+
+            await UserRoles.addRoleToUser(
+              'public',
+              res.user.id,
+              ROLE_NAMES.SELLER,
+            );
           } catch (error) {
             SuperTokens.deleteUser(res.user.id);
             throw error;
