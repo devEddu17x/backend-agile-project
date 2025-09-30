@@ -6,6 +6,7 @@ import SuperTokens, { User } from 'supertokens-node';
 import { CreateEmployeeDTO } from 'src/employee/dtos/create-employee.dto';
 import { EmployeeEntity } from 'src/employee/entities/employee.entitiy';
 import EmailPassword from 'supertokens-node/recipe/emailpassword';
+import { EmployeeWithRoles } from 'src/employee/interfaces/employee-with-roles.interface';
 
 @Injectable()
 export class AdminService {
@@ -60,7 +61,49 @@ export class AdminService {
     return await this.employeeService.updateEmployeeRole(appUserId, role);
   }
 
-  async getAllEmployees() {
-    return await this.employeeService.getAllEmployees();
+  async getAllEmployees(): Promise<EmployeeWithRoles[]> {
+    // getting all employees and roles
+    const employees: EmployeeEntity[] =
+      await this.employeeService.getAllEmployees();
+    const allRoles = ROLE_NAMES ? Object.values(ROLE_NAMES) : [];
+
+    // getting users for each role
+    const roleWithUsers = await Promise.all(
+      allRoles.map((role) => UserRoles.getUsersThatHaveRole('public', role)),
+    );
+
+    if (roleWithUsers.some((roleGroup) => roleGroup.status !== 'OK')) {
+      throw new NotFoundException('Error fetching roles');
+    }
+
+    // Mapping roles to their users
+    const rolesMap: Record<string, string[]> = {};
+    roleWithUsers.forEach((roleGroup, index) => {
+      const roleName = allRoles[index];
+      if (roleGroup.status === 'OK') {
+        rolesMap[roleName] = roleGroup.users;
+      }
+    });
+
+    // Mapping employees to include their roles
+    const employeesWithRoles: EmployeeWithRoles[] = employees.map(
+      (employee) => {
+        const userRoles: string[] = [];
+
+        // Check which roles the employee is in
+        Object.entries(rolesMap).forEach(([roleName, userIds]) => {
+          if (userIds.includes(employee.superTokensId)) {
+            userRoles.push(roleName);
+          }
+        });
+
+        return {
+          ...employee,
+          roles: userRoles,
+        };
+      },
+    );
+
+    return employeesWithRoles;
   }
 }
