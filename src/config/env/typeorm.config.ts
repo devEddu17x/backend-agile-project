@@ -34,5 +34,9 @@ export default registerAs('typeorm', () => {
     database: DB_NAME,
     entities: [CustomerEntity, EmployeeEntity, ClothesEntity],
     synchronize: process.env.NODE_ENV !== 'production',
+    ssl: {
+      rejectUnauthorized: false,
+    },
+    uuidExtension: 'pgcrypto',
   };
 });
