@@ -1,6 +1,14 @@
-import { IsString, IsNumber, IsNotEmpty, Min, IsEnum } from 'class-validator';
-import { Gender } from '../enum/gender.enum';
-import { ClothesSize } from '../enum/size.enum';
+import {
+  IsString,
+  IsNumber,
+  IsNotEmpty,
+  Min,
+  IsEnum,
+  IsArray,
+  ValidateNested,
+} from 'class-validator';
+import { CLOTHES_GENDER } from '../enum/gender.enum';
+import { CLOTHES_SIZES } from '../enum/size.enum';
 
 export class CreateClothesDTO {
   @IsNotEmpty()
@@ -13,15 +21,26 @@ export class CreateClothesDTO {
 
   @IsNotEmpty()
   @IsNumber()
-  @Min(0.01)
+  @Min(0)
   price: number;
 
   @IsNotEmpty()
-  @IsString()
-  @IsEnum(Gender)
-  genre: Gender;
+  @IsArray()
+  @ValidateNested({ each: true })
+  variants: Variant[];
+}
+
+class Variant {
+  @IsNotEmpty()
+  @IsEnum(CLOTHES_GENDER)
+  gender: CLOTHES_GENDER;
 
   @IsNotEmpty()
-  @IsEnum(ClothesSize)
-  size: ClothesSize;
+  @IsEnum(CLOTHES_SIZES)
+  size: CLOTHES_SIZES;
+
+  @IsNotEmpty()
+  @IsNumber()
+  @Min(0)
+  additional: number;
 }

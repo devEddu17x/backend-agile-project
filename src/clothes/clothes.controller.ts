@@ -8,6 +8,6 @@ export class ClothesController {
 
   @Post()
   async createClothes(@Body() clothesDto: CreateClothesDTO) {
-    return await this.clothesService.create(clothesDto);
+    return await this.clothesService.addNewClothesItem(clothesDto);
   }
 }
