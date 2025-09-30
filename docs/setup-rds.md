@@ -10,7 +10,13 @@ Follow these steps to configure the schemas:
    CREATE DATABASE dumi_development;
    ```
 
-2. **Connect to Database**
+1. **Enable pgcrypto (If you want to use uuid)**
+
+   ```sql
+   CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+   ```
+
+1. **Connect to Database**
 
    ```
    \c dumi_development
@@ -18,28 +24,28 @@ Follow these steps to configure the schemas:
 
    If your are using Dbeaver or a similar client just create a new connection a change database name to **dumi_development**
 
-3. **Create Schemas**
+1. **Create Schemas**
 
    ```sql
     CREATE SCHEMA supertokens;
     CREATE SCHEMA dumi_app;
    ```
 
-4. **Create Users**
+1. **Create Users**
 
    ```sql
     CREATE USER supertokens_user WITH PASSWORD 'secure_password';
     CREATE USER dumi_app_user WITH PASSWORD 'secure_password';
    ```
 
-5. **Grant Privileges**
+1. **Grant Privileges**
 
    ```sql
    GRANT ALL PRIVILEGES ON SCHEMA supertokens TO supertokens_user;
    GRANT ALL PRIVILEGES ON SCHEMA dumi_app TO dumi_app_user;
    ```
 
-6. **Set SearchPath**
+1. **Set SearchPath**
 
    ```sql
     ALTER ROLE supertokens_user SET search_path = supertokens;
