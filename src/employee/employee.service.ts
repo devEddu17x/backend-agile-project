@@ -23,11 +23,8 @@ export class EmployeeService {
     createEmployeDTO: CreateEmployeeDTO,
   ): Promise<EmployeeEntity> {
     try {
-      const employee: EmployeeEntity = this.employeeRepository.create({
-        ...createEmployeDTO,
-        names: '',
-        lastNames: '',
-      });
+      const employee: EmployeeEntity =
+        this.employeeRepository.create(createEmployeDTO);
       return await this.employeeRepository.save(employee);
     } catch (error) {
       if (error.code === '23505') {
