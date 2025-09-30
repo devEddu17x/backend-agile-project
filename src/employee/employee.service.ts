@@ -5,6 +5,8 @@ import { Repository } from 'typeorm/repository/Repository';
 import { CreateEmployeeDTO } from './dtos/create-employee.dto';
 import { UpdateEmployeeDTO } from './dtos/update-employee.dto';
 import { Logger } from '@nestjs/common';
+import { ROLE_NAMES } from 'src/auth/constants/roles';
+import UserRoles from 'supertokens-node/recipe/userroles';
 
 @Injectable()
 export class EmployeeService {
@@ -61,5 +63,16 @@ export class EmployeeService {
         'Error deleting employee or does not exist',
       );
     }
+  }
+
+  async updateEmployeeRole(
+    appUserId: string,
+    role: ROLE_NAMES,
+  ): Promise<{ message: string }> {
+    const response = await UserRoles.addRoleToUser('public', appUserId, role);
+    if (response.status !== 'OK') {
+      throw new BadRequestException('Could not update user role');
+    }
+    return { message: `Role ${role} assigned to user ${appUserId}` };
   }
 }
