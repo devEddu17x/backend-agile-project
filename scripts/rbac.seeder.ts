@@ -5,7 +5,7 @@ import Session from 'supertokens-node/recipe/session';
 import UserMetadata from 'supertokens-node/recipe/usermetadata';
 import { DataSource } from 'typeorm';
 import { ROLE_NAMES, ROLES } from '../src/auth/constants/roles';
-import { EmployeeEntity } from '../src/employee/entities/employee.entitiy';
+import { EmployeeEntity } from '../src/employee/entities/employee.entity';
 
 import * as dotenv from 'dotenv';
 import { APP_USER_ID_METADATA_KEY } from '../src/auth/constants/app-user-id-key';
