@@ -5,12 +5,14 @@ import {
   Get,
   NotFoundException,
   Patch,
+  Post,
   UseGuards,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { PromoteEmployeeDTO } from './dtos/promote-employee.dto';
 import { SuperTokensAuthGuard, VerifySession } from 'supertokens-nestjs';
 import { ROLE_NAMES } from 'src/auth/constants/roles';
+import { CreateEmployeeDTO } from 'src/employee/dtos/create-employee.dto';
 
 @UseGuards(SuperTokensAuthGuard)
 @Controller('admin')
@@ -41,6 +43,15 @@ export class AdminController {
       throw new ConflictException('Could not update employee role');
     }
   }
+
+  @VerifySession({
+    roles: [ROLE_NAMES.ADMIN],
+  })
+  @Post('employees')
+  async createEmployee(@Body() createEmployeeDTO: CreateEmployeeDTO) {
+    return await this.adminService.createEmployee(createEmployeeDTO);
+  }
+
   @VerifySession({
     roles: [ROLE_NAMES.ADMIN],
   })
