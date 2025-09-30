@@ -34,10 +34,15 @@ export class AdminService {
     }
 
     let employee = null;
-    employee = await this.employeeService.createEmployee(
-      createEmployeeDTO,
-      stRes.user.id,
-    );
+    try {
+      employee = await this.employeeService.createEmployee(
+        createEmployeeDTO,
+        stRes.user.id,
+      );
+    } catch (error) {
+      await SuperTokens.deleteUser(stRes.user.id);
+      throw error;
+    }
 
     if (!employee) {
       await SuperTokens.deleteUser(stRes.user.id);

@@ -1,10 +1,8 @@
 import {
   Body,
-  ConflictException,
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -26,25 +24,17 @@ export class AdminController {
   })
   @Get('roles')
   async getAllRoles() {
-    try {
-      return await this.adminService.getAllRoles();
-    } catch (error) {
-      throw new NotFoundException('Could not fetch roles');
-    }
+    return await this.adminService.getAllRoles();
   }
   @VerifySession({
     roles: [ROLE_NAMES.ADMIN],
   })
   @Patch('employees/promote')
   async promoteEmployeeRole(@Body() promoteEmployeeDTO: PromoteEmployeeDTO) {
-    try {
-      return await this.adminService.updateEmployeeRole(
-        promoteEmployeeDTO.email,
-        promoteEmployeeDTO.role,
-      );
-    } catch (error) {
-      throw new ConflictException('Could not update employee role');
-    }
+    return await this.adminService.updateEmployeeRole(
+      promoteEmployeeDTO.email,
+      promoteEmployeeDTO.role,
+    );
   }
 
   @VerifySession({
@@ -52,14 +42,10 @@ export class AdminController {
   })
   @Patch('employees/revoke')
   async revokeEmployeeRole(@Body() promoteEmployeeDTO: PromoteEmployeeDTO) {
-    try {
-      return await this.adminService.revokeEmployeeRole(
-        promoteEmployeeDTO.email,
-        promoteEmployeeDTO.role,
-      );
-    } catch (error) {
-      throw new ConflictException('Could not update employee role');
-    }
+    return await this.adminService.revokeEmployeeRole(
+      promoteEmployeeDTO.email,
+      promoteEmployeeDTO.role,
+    );
   }
 
   @VerifySession({
