@@ -93,7 +93,7 @@ export class AdminService {
     // getting all employees and roles
     const employees: EmployeeEntity[] =
       await this.employeeService.getAllEmployees();
-    const allRoles = ROLE_NAMES ? Object.values(ROLE_NAMES) : [];
+    const allRoles = (await UserRoles.getAllRoles()).roles ?? [];
 
     // getting users for each role
     const roleWithUsers = await Promise.all(
