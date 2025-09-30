@@ -2,8 +2,11 @@ import {
   Body,
   ConflictException,
   Controller,
+  Delete,
   Get,
   NotFoundException,
+  Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   UseGuards,
@@ -73,5 +76,13 @@ export class AdminController {
   @Get('employees')
   async getAllEmployees() {
     return await this.adminService.getAllEmployees();
+  }
+
+  @VerifySession({
+    roles: [ROLE_NAMES.ADMIN],
+  })
+  @Delete('employees/:superTokenId')
+  async deleteEmployee(@Param('superTokenId', ParseUUIDPipe) id: string) {
+    return await this.adminService.deleteEmployee(id);
   }
 }

@@ -121,4 +121,14 @@ export class AdminService {
 
     return employeesWithRoles;
   }
+
+  async deleteEmployee(superTokensId: string): Promise<{ message: string }> {
+    const appUserDeleted =
+      await this.employeeService.deleteEmployeeBySuperTokensId(superTokensId);
+    if (!appUserDeleted) {
+      throw new NotFoundException('Could not delete employee');
+    }
+    await SuperTokens.deleteUser(superTokensId);
+    return { message: 'Employee deleted successfully' };
+  }
 }

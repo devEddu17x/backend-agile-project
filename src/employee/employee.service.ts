@@ -69,6 +69,21 @@ export class EmployeeService {
     }
   }
 
+  async deleteEmployeeBySuperTokensId(
+    superTokensId: string,
+  ): Promise<{ message: string }> {
+    try {
+      const result = await this.employeeRepository.delete({ superTokensId });
+      if (result.affected !== 0) {
+        return { message: 'Employee deleted successfully' };
+      }
+    } catch (error) {
+      throw new BadRequestException(
+        'Error deleting employee or does not exist',
+      );
+    }
+  }
+
   async updateEmployeeRole(
     appUserId: string,
     role: ROLE_NAMES,
