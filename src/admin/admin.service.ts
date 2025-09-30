@@ -21,26 +21,27 @@ export class AdminService {
 
   async createEmployee(
     createEmployeeDTO: CreateEmployeeDTO,
-  ): Promise<EmployeeEntity> {
-    const [employee, stRes] = await Promise.all([
-      this.employeeService.createEmployee(createEmployeeDTO),
-      EmailPassword.signUp(
-        'public',
-        createEmployeeDTO.email,
-        createEmployeeDTO.password,
-      ),
-    ]);
+  ): Promise<EmployeeEntity | { status: string }> {
+    const stRes = await EmailPassword.signUp(
+      'public',
+      createEmployeeDTO.email,
+      createEmployeeDTO.password,
+    );
 
     if (stRes.status !== 'OK') {
-      await this.employeeService.deleteEmployee(employee.id);
-      throw new NotFoundException('Could not create employee');
+      return stRes;
     }
+
+    let employee = null;
+    employee = await this.employeeService.createEmployee(
+      createEmployeeDTO,
+      stRes.user.id,
+    );
 
     if (!employee) {
       await SuperTokens.deleteUser(stRes.user.id);
       throw new NotFoundException('Could not create employee');
     }
-
     return employee;
   }
 

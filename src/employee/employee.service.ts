@@ -21,10 +21,13 @@ export class EmployeeService {
   ) {}
   async createEmployee(
     createEmployeDTO: CreateEmployeeDTO,
+    superTokensId: string,
   ): Promise<EmployeeEntity> {
     try {
-      const employee: EmployeeEntity =
-        this.employeeRepository.create(createEmployeDTO);
+      const employee: EmployeeEntity = this.employeeRepository.create({
+        ...createEmployeDTO,
+        superTokensId,
+      });
       return await this.employeeRepository.save(employee);
     } catch (error) {
       if (error.code === '23505') {

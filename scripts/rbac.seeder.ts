@@ -108,6 +108,7 @@ async function main() {
           names: 'Seed User',
           lastNames: 'Last Name',
           email: res.user.emails[0],
+          superTokensId: userId,
         });
         const [appUser] = await Promise.all([
           DumiDataSource.getRepository(EmployeeEntity).save(user),

@@ -20,6 +20,9 @@ export class EmployeeEntity {
   @Column({ type: 'varchar', length: 50, nullable: false, unique: true })
   email: string;
 
+  @Column({ type: 'varchar', length: 36, nullable: false, unique: true })
+  superTokensId: string;
+
   @CreateDateColumn()
   createdAt: Date;
 
