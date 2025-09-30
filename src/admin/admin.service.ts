@@ -9,7 +9,7 @@ import { EmployeeService } from 'src/employee/employee.service';
 import UserRoles from 'supertokens-node/recipe/userroles';
 import SuperTokens, { User } from 'supertokens-node';
 import { CreateEmployeeDTO } from 'src/employee/dtos/create-employee.dto';
-import { EmployeeEntity } from 'src/employee/entities/employee.entitiy';
+import { EmployeeEntity } from 'src/employee/entities/employee.entity';
 import EmailPassword from 'supertokens-node/recipe/emailpassword';
 import { EmployeeWithRoles } from 'src/employee/interfaces/employee-with-roles.interface';
 

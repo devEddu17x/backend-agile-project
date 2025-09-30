@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EmployeeEntity } from './entities/employee.entitiy';
+import { EmployeeEntity } from './entities/employee.entity';
 import { Repository } from 'typeorm/repository/Repository';
 import { CreateEmployeeDTO } from './dtos/create-employee.dto';
 import { UpdateEmployeeDTO } from './dtos/update-employee.dto';
