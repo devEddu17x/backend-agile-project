@@ -1,4 +1,4 @@
-export enum ClothesSize {
+export enum CLOTHES_SIZES {
   TALLA_2 = '2',
   TALLA_4 = '4',
   TALLA_6 = '6',

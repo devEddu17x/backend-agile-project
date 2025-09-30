@@ -1,4 +1,5 @@
-export enum Gender {
+export enum CLOTHES_GENDER {
   MALE = 'HOMBRE',
   FEMALE = 'MUJER',
+  UNISEX = 'UNISEX',
 }
