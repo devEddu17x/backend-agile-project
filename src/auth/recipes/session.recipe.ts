@@ -4,19 +4,13 @@ import { AppUserIdClaim } from '../claims/app-user-id.claim';
 
 export function buildSessionRecipe(dependencies: { config: ConfigService }) {
   const { config } = dependencies;
-
-  const cookieDomain = config.get<string>('cookie.cookieDomain');
-  const cookieSameSite =
-    (config.get<string>('cookie.cookieSameSite') as
-      | 'lax'
-      | 'strict'
-      | 'none') ?? 'lax';
-  const cookieSecure = config.get<boolean>('cookie.cookieSecure') ?? false;
+  const cookieConfig = config.get('cookie');
+  if (!cookieConfig) {
+    throw new Error('Cookie configuration is missing');
+  }
   return Session.init({
     getTokenTransferMethod: () => 'cookie',
-    cookieDomain,
-    cookieSameSite,
-    cookieSecure,
+    ...cookieConfig,
     override: {
       functions: (original) => ({
         ...original,
