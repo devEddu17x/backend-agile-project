@@ -36,9 +36,9 @@ export class ClothesService {
 
     for (const v of variants) {
       if (!sizeIdByEnum.get(v.size))
-        throw new BadRequestException(`Talla desconocida: ${v.size}`);
+        throw new BadRequestException(`Unknown size: ${v.size}`);
       if (!genderIdByEnum.get(v.gender))
-        throw new BadRequestException(`Género desconocido: ${v.gender}`);
+        throw new BadRequestException(`Unknown gender: ${v.gender}`);
     }
 
     try {
