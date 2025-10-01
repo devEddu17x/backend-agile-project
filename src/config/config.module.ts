@@ -10,6 +10,7 @@ import * as config from './env';
         config.supertokensConfig,
         config.typeormConfig,
         config.cookieConfig,
+        config.apiConfig,
       ],
     }),
   ],
