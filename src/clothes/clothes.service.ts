@@ -1,11 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { ClothesEntity } from './entities/clothes.entity';
 import { CreateClothesDTO } from './dto/create-clothes.dto';
 import { ClothesVariantEntity } from './entities/clothes-variant.entity';
 import { SizeEntity } from './entities/size.entity';
 import { GenderEntity } from './entities/gender.entity';
+import { CreatedClothes } from './interfaces/created-clothes.interface';
 
 @Injectable()
 export class ClothesService {
@@ -18,9 +19,10 @@ export class ClothesService {
     private readonly sizeRepository: Repository<SizeEntity>,
     @InjectRepository(GenderEntity)
     private readonly genderRepository: Repository<GenderEntity>,
+    private readonly dataSource: DataSource,
   ) {}
 
-  async addNewClothesItem(clothes: CreateClothesDTO) {
+  async addNewClothesItem(clothes: CreateClothesDTO): Promise<CreatedClothes> {
     const { name, description, price, variants } = clothes;
 
     const uniqueSizes = [...new Set(variants.map((v) => v.size))];
@@ -41,13 +43,14 @@ export class ClothesService {
         throw new BadRequestException(`Unknown gender: ${v.gender}`);
     }
 
+    const queryRunner = this.dataSource.createQueryRunner();
     try {
-      const newClothe = this.clothesRepository.create({
-        name,
-        description,
-        price,
-      });
-
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      const newClothe = await queryRunner.manager.save(
+        ClothesEntity,
+        this.clothesRepository.create({ name, description, price }),
+      );
       const newVariants = variants.map((v) =>
         this.variantsRepository.create({
           clothesId: newClothe.id,
@@ -56,11 +59,15 @@ export class ClothesService {
           additional: v.additional,
         }),
       );
-
-      await this.clothesRepository.save(newClothe);
-      await this.variantsRepository.save(newVariants);
+      const savedVariants: ClothesVariantEntity[] =
+        await queryRunner.manager.save(ClothesVariantEntity, newVariants);
+      await queryRunner.commitTransaction();
+      return { ...newClothe, variants: savedVariants };
     } catch (error) {
+      await queryRunner.rollbackTransaction();
       throw new BadRequestException('Error creating the clothes item');
+    } finally {
+      await queryRunner.release();
     }
   }
 }

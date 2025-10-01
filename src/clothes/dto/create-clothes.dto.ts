@@ -7,6 +7,7 @@ import {
   IsArray,
   ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { CLOTHES_GENDER } from '../enum/gender.enum';
 import { CLOTHES_SIZES } from '../enum/size.enum';
 
@@ -27,10 +28,11 @@ export class CreateClothesDTO {
   @IsNotEmpty()
   @IsArray()
   @ValidateNested({ each: true })
+  @Type(() => Variant)
   variants: Variant[];
 }
 
-class Variant {
+export class Variant {
   @IsNotEmpty()
   @IsEnum(CLOTHES_GENDER)
   gender: CLOTHES_GENDER;
