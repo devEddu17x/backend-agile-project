@@ -1,6 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import UserRoles from 'supertokens-node/recipe/userroles';
+import { ROLES } from '../constants/roles';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -39,7 +40,7 @@ export class RolesGuard implements CanActivate {
   }
 
   private matchRoles(requiredRoles: string[], userRoles: string[]): boolean {
-    if (userRoles.includes('admin')) {
+    if (userRoles.includes(ROLES.ADMIN)) {
       return true;
     }
     return requiredRoles.some((role) => userRoles.includes(role));
