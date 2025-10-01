@@ -19,6 +19,30 @@ export class EmployeeService {
     @InjectRepository(EmployeeEntity)
     private readonly employeeRepository: Repository<EmployeeEntity>,
   ) {}
+
+  async getEmployee(id: string): Promise<EmployeeEntity> {
+    const employee = await this.employeeRepository.findOneBy({ id });
+    if (!employee) {
+      throw new NotFoundException('Employee not found');
+    }
+    return employee;
+  }
+
+  async getRolesForEmployee(superTokensUserId: string): Promise<string[]> {
+    try {
+      const roles = await UserRoles.getRolesForUser(
+        'public',
+        superTokensUserId,
+      );
+      if (roles.status !== 'OK') {
+        throw new BadRequestException('Could not fetch user roles');
+      }
+      return roles.roles;
+    } catch (error) {
+      this.logger.error('Error fetching user roles', error);
+      throw new BadRequestException('Error fetching user roles');
+    }
+  }
   async createEmployee(
     createEmployeDTO: CreateEmployeeDTO,
     superTokensId: string,

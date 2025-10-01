@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Patch,
   UnauthorizedException,
   UseGuards,
@@ -18,6 +19,22 @@ import { EmployeeEntity } from './entities/employee.entity';
 @Controller('employee')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
+
+  @Get('me')
+  @VerifySession()
+  async getEmployee(
+    @Session() session: SessionContainer,
+  ): Promise<EmployeeEntity & { roles: string[] }> {
+    const appUserId = session.getAccessTokenPayload().appUserId;
+    if (!appUserId) {
+      throw new UnauthorizedException('Session missing app user id');
+    }
+    const [employee, userRoles] = await Promise.all([
+      this.employeeService.getEmployee(appUserId.v),
+      this.employeeService.getRolesForEmployee(session.getUserId()),
+    ]);
+    return { ...employee, roles: userRoles };
+  }
 
   @Patch()
   @VerifySession()
