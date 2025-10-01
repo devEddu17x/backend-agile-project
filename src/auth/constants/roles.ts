@@ -11,18 +11,18 @@ enum RESOURCE {
   SELF = 'self',
 }
 
-export enum ROLE_NAMES {
+export enum ROLES {
   CUSTOMER = 'customer',
   ADMIN = 'admin',
   SELLER = 'seller',
 }
 
 // format: ACTION:RESOURCE
-export const ROLES: Record<string, string[]> = {
-  [ROLE_NAMES.CUSTOMER]: [`${ACTION.READ}:${RESOURCE.CLOTHES}`],
-  [ROLE_NAMES.ADMIN]: [
+export const ROLE_PERMISSIONS: Record<string, string[]> = {
+  [ROLES.CUSTOMER]: [`${ACTION.READ}:${RESOURCE.CLOTHES}`],
+  [ROLES.ADMIN]: [
     `${ACTION.CREATE}:${RESOURCE.CLOTHES}`,
     `${ACTION.READ}:${RESOURCE.CLOTHES}`,
   ],
-  [ROLE_NAMES.SELLER]: [`${ACTION.READ}:${RESOURCE.CLOTHES}`],
+  [ROLES.SELLER]: [`${ACTION.READ}:${RESOURCE.CLOTHES}`],
 };

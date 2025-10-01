@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { ROLE_NAMES } from 'src/auth/constants/roles';
+import { ROLES } from 'src/auth/constants/roles';
 import { EmployeeService } from 'src/employee/employee.service';
 import UserRoles from 'supertokens-node/recipe/userroles';
 import SuperTokens, { User } from 'supertokens-node';
@@ -59,7 +59,7 @@ export class AdminService {
     return employee;
   }
 
-  async updateEmployeeRole(email: string, role: ROLE_NAMES) {
+  async updateEmployeeRole(email: string, role: ROLES) {
     const userResponse: User[] = await SuperTokens.listUsersByAccountInfo(
       'public',
       {
@@ -74,7 +74,7 @@ export class AdminService {
     return await this.employeeService.updateEmployeeRole(appUserId, role);
   }
 
-  async revokeEmployeeRole(email: string, role: ROLE_NAMES) {
+  async revokeEmployeeRole(email: string, role: ROLES) {
     const userResponse: User[] = await SuperTokens.listUsersByAccountInfo(
       'public',
       {

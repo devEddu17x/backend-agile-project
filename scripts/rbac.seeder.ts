@@ -4,7 +4,7 @@ import EmailPassword from 'supertokens-node/recipe/emailpassword';
 import Session from 'supertokens-node/recipe/session';
 import UserMetadata from 'supertokens-node/recipe/usermetadata';
 import { DataSource } from 'typeorm';
-import { ROLE_NAMES, ROLES } from '../src/auth/constants/roles';
+import { ROLES, ROLE_PERMISSIONS } from '../src/auth/constants/roles';
 import { EmployeeEntity } from '../src/employee/entities/employee.entity';
 
 import * as dotenv from 'dotenv';
@@ -81,7 +81,7 @@ async function main() {
   }
   try {
     await Promise.all(
-      Object.entries(ROLES).map(([role, perms]) =>
+      Object.entries(ROLE_PERMISSIONS).map(([role, perms]) =>
         UserRoles.createNewRoleOrAddPermissions(role, perms),
       ),
     );
@@ -123,7 +123,7 @@ async function main() {
           UserRoles.addRoleToUser(
             'public',
             userId,
-            user.email === EMAIL_ADMIN ? ROLE_NAMES.ADMIN : ROLE_NAMES.SELLER,
+            user.email === EMAIL_ADMIN ? ROLES.ADMIN : ROLES.SELLER,
           ),
         ]);
 

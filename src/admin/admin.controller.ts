@@ -11,7 +11,7 @@ import {
 import { AdminService } from './admin.service';
 import { PromoteEmployeeDTO } from './dtos/promote-employee.dto';
 import { SuperTokensAuthGuard, VerifySession } from 'supertokens-nestjs';
-import { ROLE_NAMES } from 'src/auth/constants/roles';
+import { ROLES } from 'src/auth/constants/roles';
 import { CreateEmployeeDTO } from 'src/employee/dtos/create-employee.dto';
 
 @UseGuards(SuperTokensAuthGuard)
@@ -19,14 +19,14 @@ import { CreateEmployeeDTO } from 'src/employee/dtos/create-employee.dto';
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
   @VerifySession({
-    roles: [ROLE_NAMES.ADMIN],
+    roles: [ROLES.ADMIN],
   })
   @Get('roles')
   async getAllRoles() {
     return await this.adminService.getAllRoles();
   }
   @VerifySession({
-    roles: [ROLE_NAMES.ADMIN],
+    roles: [ROLES.ADMIN],
   })
   @Patch('employees/promote')
   async promoteEmployeeRole(@Body() promoteEmployeeDTO: PromoteEmployeeDTO) {
@@ -37,7 +37,7 @@ export class AdminController {
   }
 
   @VerifySession({
-    roles: [ROLE_NAMES.ADMIN],
+    roles: [ROLES.ADMIN],
   })
   @Patch('employees/revoke')
   async revokeEmployeeRole(@Body() promoteEmployeeDTO: PromoteEmployeeDTO) {
@@ -48,7 +48,7 @@ export class AdminController {
   }
 
   @VerifySession({
-    roles: [ROLE_NAMES.ADMIN],
+    roles: [ROLES.ADMIN],
   })
   @Post('employees')
   async createEmployee(@Body() createEmployeeDTO: CreateEmployeeDTO) {
@@ -56,7 +56,7 @@ export class AdminController {
   }
 
   @VerifySession({
-    roles: [ROLE_NAMES.ADMIN],
+    roles: [ROLES.ADMIN],
   })
   @Get('employees')
   async getAllEmployees() {
@@ -64,7 +64,7 @@ export class AdminController {
   }
 
   @VerifySession({
-    roles: [ROLE_NAMES.ADMIN],
+    roles: [ROLES.ADMIN],
   })
   @Delete('employees/:superTokenId')
   async deleteEmployee(@Param('superTokenId') id: string) {
