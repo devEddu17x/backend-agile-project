@@ -2,14 +2,21 @@ import { registerAs } from '@nestjs/config';
 
 export default registerAs('supertokens', () => {
   // api key will be used later
-  const { CONNECTION_URI, APP_NAME, API_DOMAIN, WEBSITE_DOMAIN, API_KEY } =
-    process.env;
+  const {
+    CONNECTION_URI,
+    APP_NAME,
+    API_DOMAIN,
+    WEBSITE_DOMAIN,
+    API_KEY,
+    API_PREFIX,
+  } = process.env;
   const missingVars = [
     ['CONNECTION_URI', CONNECTION_URI],
     ['APP_NAME', APP_NAME],
     ['API_DOMAIN', API_DOMAIN],
     ['WEBSITE_DOMAIN', WEBSITE_DOMAIN],
     ['API_KEY', API_KEY],
+    ['API_PREFIX', API_PREFIX],
   ]
     .filter(([, value]) => !value)
     .map(([name]) => name);
@@ -30,6 +37,8 @@ export default registerAs('supertokens', () => {
       appName: APP_NAME,
       apiDomain: API_DOMAIN,
       websiteDomain: WEBSITE_DOMAIN,
+      apiBasePath: `${API_PREFIX}/auth`,
+      websiteBasePath: '/auth',
     },
   };
 });
