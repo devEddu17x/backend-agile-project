@@ -4,9 +4,11 @@ import { ValidationPipe } from '@nestjs/common';
 import { SuperTokensExceptionFilter } from 'supertokens-nestjs';
 import supertokens from 'supertokens-node';
 import { ConfigService } from '@nestjs/config';
+import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  app.useLogger(app.get(Logger));
   const configService = app.get(ConfigService);
   app.setGlobalPrefix(configService.get('api').prefix);
   app.enableCors({

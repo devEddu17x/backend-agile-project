@@ -11,6 +11,7 @@ import * as config from './env';
         config.typeormConfig,
         config.cookieConfig,
         config.apiConfig,
+        config.pinoLoggerConfig,
       ],
     }),
   ],
