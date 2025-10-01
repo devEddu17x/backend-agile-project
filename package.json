@@ -8,7 +8,8 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "seed": "ts-node ./scripts/rbac.seeder.ts",
+    "seed:rbac": "ts-node ./scripts/rbac.seeder.ts",
+    "seed:clothes": "ts-node ./scripts/clothes:sizes-genderes.seeder.ts",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
