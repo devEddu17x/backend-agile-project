@@ -10,24 +10,22 @@ import {
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { PromoteEmployeeDTO } from './dtos/promote-employee.dto';
-import { SuperTokensAuthGuard, VerifySession } from 'supertokens-nestjs';
-import { ROLE_NAMES } from 'src/auth/constants/roles';
+import { SuperTokensAuthGuard } from 'supertokens-nestjs';
+import { ROLES } from 'src/auth/constants/roles';
 import { CreateEmployeeDTO } from 'src/employee/dtos/create-employee.dto';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
-@UseGuards(SuperTokensAuthGuard)
+@Roles(ROLES.ADMIN)
+@UseGuards(SuperTokensAuthGuard, RolesGuard)
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
-  @VerifySession({
-    roles: [ROLE_NAMES.ADMIN],
-  })
   @Get('roles')
   async getAllRoles() {
     return await this.adminService.getAllRoles();
   }
-  @VerifySession({
-    roles: [ROLE_NAMES.ADMIN],
-  })
+
   @Patch('employees/promote')
   async promoteEmployeeRole(@Body() promoteEmployeeDTO: PromoteEmployeeDTO) {
     return await this.adminService.updateEmployeeRole(
@@ -36,9 +34,6 @@ export class AdminController {
     );
   }
 
-  @VerifySession({
-    roles: [ROLE_NAMES.ADMIN],
-  })
   @Patch('employees/revoke')
   async revokeEmployeeRole(@Body() promoteEmployeeDTO: PromoteEmployeeDTO) {
     return await this.adminService.revokeEmployeeRole(
@@ -47,25 +42,16 @@ export class AdminController {
     );
   }
 
-  @VerifySession({
-    roles: [ROLE_NAMES.ADMIN],
-  })
   @Post('employees')
   async createEmployee(@Body() createEmployeeDTO: CreateEmployeeDTO) {
     return await this.adminService.createEmployee(createEmployeeDTO);
   }
 
-  @VerifySession({
-    roles: [ROLE_NAMES.ADMIN],
-  })
   @Get('employees')
   async getAllEmployees() {
     return await this.adminService.getAllEmployees();
   }
 
-  @VerifySession({
-    roles: [ROLE_NAMES.ADMIN],
-  })
   @Delete('employees/:superTokenId')
   async deleteEmployee(@Param('superTokenId') id: string) {
     return await this.adminService.deleteEmployee(id);

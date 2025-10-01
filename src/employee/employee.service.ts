@@ -9,7 +9,7 @@ import { Repository } from 'typeorm/repository/Repository';
 import { CreateEmployeeDTO } from './dtos/create-employee.dto';
 import { UpdateEmployeeDTO } from './dtos/update-employee.dto';
 import { Logger } from '@nestjs/common';
-import { ROLE_NAMES } from 'src/auth/constants/roles';
+import { ROLES } from 'src/auth/constants/roles';
 import UserRoles from 'supertokens-node/recipe/userroles';
 
 @Injectable()
@@ -110,7 +110,7 @@ export class EmployeeService {
 
   async updateEmployeeRole(
     appUserId: string,
-    role: ROLE_NAMES,
+    role: ROLES,
   ): Promise<{ message: string }> {
     const response = await UserRoles.addRoleToUser('public', appUserId, role);
     if (response.status !== 'OK') {
@@ -119,7 +119,7 @@ export class EmployeeService {
     return { message: `Role ${role} assigned to user ${appUserId}` };
   }
 
-  async revokeEmployeeRole(appUserId: string, role: ROLE_NAMES) {
+  async revokeEmployeeRole(appUserId: string, role: ROLES) {
     const response = await UserRoles.removeUserRole('public', appUserId, role);
     if (response.status !== 'OK') {
       throw new BadRequestException('Could not revoke user role');

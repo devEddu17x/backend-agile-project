@@ -1,7 +1,7 @@
 import EmailPassword from 'supertokens-node/recipe/emailpassword';
 import SuperTokens from 'supertokens-node';
 import UserRoles from 'supertokens-node/recipe/userroles';
-import { ROLE_NAMES } from '../constants/roles';
+import { ROLES } from '../constants/roles';
 
 export function buildEmailPasswordRecipe() {
   return EmailPassword.init({
@@ -24,7 +24,7 @@ export function buildEmailPasswordRecipe() {
             await UserRoles.addRoleToUser(
               'public',
               res.user.id,
-              ROLE_NAMES.CUSTOMER,
+              ROLES.CUSTOMER,
             );
           } catch (error) {
             SuperTokens.deleteUser(res.user.id);
