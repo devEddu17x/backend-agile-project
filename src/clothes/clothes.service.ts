@@ -93,4 +93,38 @@ export class ClothesService {
     }
     return savedImages;
   }
+
+  async getAllClothes(): Promise<any> {
+    try {
+      const clothes = await this.clothesRepository
+        .createQueryBuilder('clothes')
+        .leftJoinAndSelect('clothes.clothes_variant', 'variant')
+        .leftJoinAndSelect('variant.size', 'size')
+        .leftJoinAndSelect('variant.gender', 'gender')
+        .leftJoinAndSelect('clothes.clothe_image', 'image')
+        .select([
+          // Clothes fields
+          'clothes.id',
+          'clothes.name',
+          'clothes.description',
+          'clothes.price',
+          'clothes.createdAt',
+          'clothes.updatedAt',
+          // Variant
+          'variant.additional',
+          // Size
+          'size.size',
+          // Gender
+          'gender.gender',
+          // Image fields
+          'image.url',
+        ])
+        .getMany();
+
+      return clothes;
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException('Error fetching clothes items');
+    }
+  }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ClothesService } from './clothes.service';
 import { CreateClothesDTO } from './dto/create-clothes.dto';
 import { SuperTokensAuthGuard } from 'supertokens-nestjs';
@@ -9,7 +9,6 @@ import { CreatedClothes } from './interfaces/created-clothes.interface';
 import { StorageService } from 'src/storage/storage.service';
 import { PresignedPut } from 'src/storage/interfaces/presigned-url.interface';
 
-@Roles(ROLES.ADMIN)
 @UseGuards(SuperTokensAuthGuard, RolesGuard)
 @Controller('clothes')
 export class ClothesController {
@@ -17,6 +16,8 @@ export class ClothesController {
     private readonly clothesService: ClothesService,
     private readonly storageService: StorageService,
   ) {}
+
+  @Roles(ROLES.ADMIN)
   @Post()
   async createClothes(
     @Body() clothesDto: CreateClothesDTO,
@@ -41,5 +42,10 @@ export class ClothesController {
       throw new Error('Failed to save image URLs to the database');
     }
     return { ...createdClothes, preSignedPuts };
+  }
+
+  @Get()
+  async getAllClothes(): Promise<any> {
+    return this.clothesService.getAllClothes();
   }
 }
