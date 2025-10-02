@@ -2,6 +2,7 @@ import { registerAs } from '@nestjs/config';
 import { ClothesVariantEntity } from 'src/clothes/entities/clothes-variant.entity';
 import { ClothesEntity } from 'src/clothes/entities/clothes.entity';
 import { GenderEntity } from 'src/clothes/entities/gender.entity';
+import { ClotheImageEntity } from 'src/clothes/entities/images.entity';
 import { SizeEntity } from 'src/clothes/entities/size.entity';
 import { CustomerEntity } from 'src/customer/entities/customer.entity';
 import { EmployeeEntity } from 'src/employee/entities/employee.entity';
@@ -40,6 +41,7 @@ export default registerAs('typeorm', () => {
       CustomerEntity,
       EmployeeEntity,
       ClothesVariantEntity,
+      ClotheImageEntity,
       ClothesEntity,
       SizeEntity,
       GenderEntity,
