@@ -4,9 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
 } from 'typeorm';
-import { ClotheImageEntity } from './images.entity';
 
 @Entity('clothes')
 export class ClothesEntity {
@@ -21,8 +19,6 @@ export class ClothesEntity {
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
   price: number;
-  @OneToMany(() => ClotheImageEntity, (photo) => photo.clothes)
-  images: ClotheImageEntity[];
 
   @CreateDateColumn()
   createdAt: Date;
