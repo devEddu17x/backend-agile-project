@@ -3,13 +3,13 @@ import {
   IsNumber,
   IsNotEmpty,
   Min,
-  IsEnum,
   IsArray,
   ValidateNested,
+  IsOptional,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { CLOTHES_GENDER } from '../enum/gender.enum';
-import { CLOTHES_SIZES } from '../enum/size.enum';
+import { Variant } from './variants.dto';
+import { AllowedImagesDTO } from 'src/clothes/dto/images.dto';
 
 export class CreateClothesDTO {
   @IsNotEmpty()
@@ -30,19 +30,10 @@ export class CreateClothesDTO {
   @ValidateNested({ each: true })
   @Type(() => Variant)
   variants: Variant[];
-}
 
-export class Variant {
-  @IsNotEmpty()
-  @IsEnum(CLOTHES_GENDER)
-  gender: CLOTHES_GENDER;
-
-  @IsNotEmpty()
-  @IsEnum(CLOTHES_SIZES)
-  size: CLOTHES_SIZES;
-
-  @IsNotEmpty()
-  @IsNumber()
-  @Min(0)
-  additional: number;
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => AllowedImagesDTO)
+  images: AllowedImagesDTO[];
 }

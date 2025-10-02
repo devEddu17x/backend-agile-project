@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClothesVariantEntity } from './entities/clothes-variant.entity';
 import { GenderEntity } from './entities/gender.entity';
 import { SizeEntity } from './entities/size.entity';
+import { StorageModule } from 'src/storage/storage.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { SizeEntity } from './entities/size.entity';
       ClothesEntity,
       ClothesVariantEntity,
     ]),
+    StorageModule,
   ],
   providers: [ClothesService],
   controllers: [ClothesController],
