@@ -7,6 +7,7 @@ import { ClothesVariantEntity } from './entities/clothes-variant.entity';
 import { SizeEntity } from './entities/size.entity';
 import { GenderEntity } from './entities/gender.entity';
 import { CreatedClothes } from './interfaces/created-clothes.interface';
+import { ClotheImageEntity } from './entities/images.entity';
 
 @Injectable()
 export class ClothesService {
@@ -19,6 +20,8 @@ export class ClothesService {
     private readonly sizeRepository: Repository<SizeEntity>,
     @InjectRepository(GenderEntity)
     private readonly genderRepository: Repository<GenderEntity>,
+    @InjectRepository(ClotheImageEntity)
+    private readonly imageRepository: Repository<ClotheImageEntity>,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -69,5 +72,25 @@ export class ClothesService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async addImagesToClothes(
+    clothesId: string,
+    imageUrls: string[],
+  ): Promise<ClotheImageEntity[]> {
+    const clothe = await this.clothesRepository.findOne({
+      where: { id: clothesId },
+    });
+    if (!clothe) {
+      throw new BadRequestException('Clothes item not found');
+    }
+    const newImages = imageUrls.map((url) =>
+      this.imageRepository.create({ url, clothesId }),
+    );
+    const savedImages = await this.imageRepository.save(newImages);
+    if (!savedImages || savedImages.length === 0) {
+      throw new BadRequestException('Error saving images');
+    }
+    return savedImages;
   }
 }

@@ -14,22 +14,27 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 export class StorageService {
   private s3: S3Client;
   private bucket: string;
+  private url: string;
   constructor(private readonly configService: ConfigService) {
     const storage = this.configService.get('cloudflare');
     this.s3 = new S3Client(storage.config);
     this.bucket = storage.bucket;
+    this.url = storage.baseUrlImages;
   }
 
   buildTempKey(prendaId: string, filename: string) {
     const ext = filename.includes('.') ? filename.split('.').pop() : 'bin';
     const uuid = randomUUID();
-    return `${prendaId}/tmp/${uuid}.${ext}`;
+    return `${prendaId}/${uuid}.${ext}`;
   }
   async createPresignedPuts(
     prendaId: string,
     files: FilePlan[],
     opts?: { ttlSeconds?: number; cacheControl?: string },
   ): Promise<PresignedPut[]> {
+    if (!files || files.length === 0) {
+      return [];
+    }
     const ttl = opts?.ttlSeconds ?? 600; // 10 min
     const cacheControl = opts?.cacheControl ?? 'no-cache';
 
@@ -57,6 +62,10 @@ export class StorageService {
       });
     }
     return results;
+  }
+
+  getImagesUrl(keys: string[]): string[] {
+    return keys.map((key) => `${this.url}/${key}`);
   }
 
   async exists(key: string): Promise<boolean> {

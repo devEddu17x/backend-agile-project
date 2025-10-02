@@ -23,15 +23,23 @@ export class ClothesController {
   ): Promise<CreatedClothes & { preSignedPuts: PresignedPut[] }> {
     const createdClothes: CreatedClothes =
       await this.clothesService.addNewClothesItem(clothesDto);
-    let preSignedPuts: PresignedPut[] = null;
-    if (clothesDto.images && clothesDto.images.length > 0) {
-      preSignedPuts = await this.storageService.createPresignedPuts(
+
+    const preSignedPuts: PresignedPut[] | [] =
+      await this.storageService.createPresignedPuts(
         createdClothes.id,
         clothesDto.images,
         { ttlSeconds: 3600, cacheControl: 'no-cache' },
       );
-    }
 
+    const keys = preSignedPuts.map((put) => put.key);
+    const imageUrls = this.storageService.getImagesUrl(keys);
+    const savedImages = await this.clothesService.addImagesToClothes(
+      createdClothes.id,
+      imageUrls,
+    );
+    if (!savedImages || savedImages.length === 0) {
+      throw new Error('Failed to save image URLs to the database');
+    }
     return { ...createdClothes, preSignedPuts };
   }
 }
