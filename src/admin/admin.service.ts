@@ -41,6 +41,8 @@ export class AdminService {
       throw new BadRequestException('Sign up failed');
     }
 
+    await UserRoles.addRoleToUser('public', stRes.user.id, ROLES.SELLER);
+    await UserRoles.removeUserRole('public', stRes.user.id, ROLES.CUSTOMER);
     let employee = null;
     try {
       employee = await this.employeeService.createEmployee(
