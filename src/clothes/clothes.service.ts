@@ -67,6 +67,7 @@ export class ClothesService {
       await queryRunner.commitTransaction();
       return { ...newClothe, variants: savedVariants };
     } catch (error) {
+      console.log(error);
       await queryRunner.rollbackTransaction();
       throw new BadRequestException('Error creating the clothes item');
     } finally {
@@ -112,6 +113,7 @@ export class ClothesService {
           'clothes.updatedAt',
           // Variant
           'variant.additional',
+          'variant.id',
           // Size
           'size.size',
           // Gender
