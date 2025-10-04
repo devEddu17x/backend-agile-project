@@ -16,7 +16,7 @@ import {
 import { SessionContainer } from 'supertokens-node/recipe/session';
 import { EmployeeEntity } from './entities/employee.entity';
 @UseGuards(SuperTokensAuthGuard)
-@Controller('employee')
+@Controller('employees')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
