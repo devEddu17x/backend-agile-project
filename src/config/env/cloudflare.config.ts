@@ -7,6 +7,7 @@ export default registerAs('cloudflare', () => {
     SECRET_ACCESS_KEY,
     BUCKET_NAME,
     BASE_URL,
+    BASE_URL_IMAGES,
   } = process.env;
 
   const missingVars = [
@@ -15,6 +16,7 @@ export default registerAs('cloudflare', () => {
     ['SECRET_ACCESS_KEY', SECRET_ACCESS_KEY],
     ['BUCKET_NAME', BUCKET_NAME],
     ['BASE_URL', BASE_URL],
+    ['BASE_URL_IMAGES', BASE_URL_IMAGES],
   ]
     .filter(([, value]) => !value)
     .map(([name]) => name);
@@ -35,5 +37,6 @@ export default registerAs('cloudflare', () => {
       },
     },
     bucket: BUCKET_NAME,
+    baseUrlImages: BASE_URL_IMAGES,
   };
 });

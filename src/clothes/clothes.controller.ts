@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ClothesService } from './clothes.service';
 import { CreateClothesDTO } from './dto/create-clothes.dto';
 import { SuperTokensAuthGuard } from 'supertokens-nestjs';
@@ -9,7 +9,6 @@ import { CreatedClothes } from './interfaces/created-clothes.interface';
 import { StorageService } from 'src/storage/storage.service';
 import { PresignedPut } from 'src/storage/interfaces/presigned-url.interface';
 
-@Roles(ROLES.ADMIN)
 @UseGuards(SuperTokensAuthGuard, RolesGuard)
 @Controller('clothes')
 export class ClothesController {
@@ -17,21 +16,36 @@ export class ClothesController {
     private readonly clothesService: ClothesService,
     private readonly storageService: StorageService,
   ) {}
+
+  @Roles(ROLES.ADMIN)
   @Post()
   async createClothes(
     @Body() clothesDto: CreateClothesDTO,
   ): Promise<CreatedClothes & { preSignedPuts: PresignedPut[] }> {
     const createdClothes: CreatedClothes =
       await this.clothesService.addNewClothesItem(clothesDto);
-    let preSignedPuts: PresignedPut[] = null;
-    if (clothesDto.images && clothesDto.images.length > 0) {
-      preSignedPuts = await this.storageService.createPresignedPuts(
+
+    const preSignedPuts: PresignedPut[] | [] =
+      await this.storageService.createPresignedPuts(
         createdClothes.id,
         clothesDto.images,
         { ttlSeconds: 3600, cacheControl: 'no-cache' },
       );
-    }
 
+    const keys = preSignedPuts.map((put) => put.key);
+    const imageUrls = this.storageService.getImagesUrl(keys);
+    const savedImages = await this.clothesService.addImagesToClothes(
+      createdClothes.id,
+      imageUrls,
+    );
+    if (!savedImages || savedImages.length === 0) {
+      throw new Error('Failed to save image URLs to the database');
+    }
     return { ...createdClothes, preSignedPuts };
+  }
+
+  @Get()
+  async getAllClothes(): Promise<any> {
+    return this.clothesService.getAllClothes();
   }
 }

@@ -4,7 +4,10 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { ClothesVariantEntity } from './clothes-variant.entity';
+import { ClotheImageEntity } from './images.entity';
 
 @Entity('clothes')
 export class ClothesEntity {
@@ -25,4 +28,10 @@ export class ClothesEntity {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => ClothesVariantEntity, (variant) => variant.clothes)
+  clothes_variant: ClothesVariantEntity[];
+
+  @OneToMany(() => ClotheImageEntity, (image) => image.clothes)
+  clothe_image: ClotheImageEntity[];
 }
