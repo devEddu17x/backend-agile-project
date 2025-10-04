@@ -1,4 +1,10 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { ClothesEntity } from './clothes.entity';
 import { GenderEntity } from './gender.entity';
@@ -6,21 +12,24 @@ import { SizeEntity } from './size.entity';
 
 @Entity('clothes_variant')
 export class ClothesVariantEntity {
-  @PrimaryColumn('uuid', { name: 'clothes_id' })
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column('uuid', { name: 'clothes_id' })
   clothesId: string;
 
   @ManyToOne(() => ClothesEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'clothes_id', referencedColumnName: 'id' })
   clothes: ClothesEntity;
 
-  @PrimaryColumn('uuid', { name: 'size_id' })
+  @Column('uuid', { name: 'size_id' })
   sizeId: string;
 
   @ManyToOne(() => SizeEntity, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'size_id', referencedColumnName: 'id' })
   size: SizeEntity;
 
-  @PrimaryColumn('uuid', { name: 'gender_id' })
+  @Column('uuid', { name: 'gender_id' })
   genderId: string;
 
   @ManyToOne(() => GenderEntity, { onDelete: 'RESTRICT' })
@@ -28,5 +37,5 @@ export class ClothesVariantEntity {
   gender: GenderEntity;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
-  additional?: number;
+  additional: number;
 }
