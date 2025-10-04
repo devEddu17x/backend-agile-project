@@ -50,6 +50,7 @@ const DumiDataSource = new DataSource({
   synchronize: true,
   logging: true,
   ...ssl,
+  uuidExtension: 'pgcrypto',
 });
 
 async function main() {
