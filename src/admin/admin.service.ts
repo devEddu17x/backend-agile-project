@@ -12,6 +12,8 @@ import { CreateEmployeeDTO } from 'src/employee/dtos/create-employee.dto';
 import { EmployeeEntity } from 'src/employee/entities/employee.entity';
 import EmailPassword from 'supertokens-node/recipe/emailpassword';
 import { EmployeeWithRoles } from 'src/employee/interfaces/employee-with-roles.interface';
+import UserMetadata from 'supertokens-node/recipe/usermetadata';
+import { APP_USER_ID_METADATA_KEY } from 'src/auth/constants/app-user-id-key';
 
 @Injectable()
 export class AdminService {
@@ -43,6 +45,7 @@ export class AdminService {
 
     await UserRoles.addRoleToUser('public', stRes.user.id, ROLES.SELLER);
     await UserRoles.removeUserRole('public', stRes.user.id, ROLES.CUSTOMER);
+
     let employee = null;
     try {
       employee = await this.employeeService.createEmployee(
@@ -58,6 +61,18 @@ export class AdminService {
       await SuperTokens.deleteUser(stRes.user.id);
       throw new NotFoundException('Could not create employee');
     }
+
+    try {
+      await UserMetadata.updateUserMetadata(stRes.user.id, {
+        [APP_USER_ID_METADATA_KEY]: employee.id,
+      });
+    } catch (error) {
+      // Si falla guardar el metadata, eliminar el empleado y el usuario de SuperTokens
+      await this.employeeService.deleteEmployee(employee.id);
+      await SuperTokens.deleteUser(stRes.user.id);
+      throw new BadRequestException('Failed to save user metadata');
+    }
+
     return employee;
   }
 
