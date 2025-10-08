@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
 import { ClothesEntity } from './entities/clothes.entity';
@@ -99,6 +103,25 @@ export class ClothesService {
     try {
       const clothes = await this.clothesRepository
         .createQueryBuilder('clothes')
+        .select([
+          'clothes.id',
+          'clothes.name',
+          'clothes.description',
+          'clothes.price',
+        ])
+        .getMany();
+      return clothes;
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException('Error fetching clothes items');
+    }
+  }
+
+  async getClothesById(clothesId: string): Promise<any> {
+    let clothe = null;
+    try {
+      clothe = await this.clothesRepository
+        .createQueryBuilder('clothes')
         .leftJoinAndSelect('clothes.clothes_variant', 'variant')
         .leftJoinAndSelect('variant.size', 'size')
         .leftJoinAndSelect('variant.gender', 'gender')
@@ -121,12 +144,15 @@ export class ClothesService {
           // Image fields
           'image.url',
         ])
-        .getMany();
-
-      return clothes;
+        .where('clothes.id = :clothesId', { clothesId })
+        .getOne();
     } catch (error) {
       console.log(error);
-      throw new BadRequestException('Error fetching clothes items');
+      throw new BadRequestException('Error fetching the clothes item');
     }
+    if (!clothe) {
+      throw new NotFoundException('Clothes item not found');
+    }
+    return clothe;
   }
 }

@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ClothesService } from './clothes.service';
 import { CreateClothesDTO } from './dto/create-clothes.dto';
 import { SuperTokensAuthGuard } from 'supertokens-nestjs';
@@ -47,5 +55,12 @@ export class ClothesController {
   @Get()
   async getAllClothes(): Promise<any> {
     return this.clothesService.getAllClothes();
+  }
+
+  @Get(':id')
+  async getClothesById(
+    @Param('id', ParseUUIDPipe) clothesId: string,
+  ): Promise<any> {
+    return this.clothesService.getClothesById(clothesId);
   }
 }
