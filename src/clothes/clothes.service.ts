@@ -103,11 +103,13 @@ export class ClothesService {
     try {
       const clothes = await this.clothesRepository
         .createQueryBuilder('clothes')
+        .leftJoinAndSelect('clothes.clothe_image', 'image')
         .select([
           'clothes.id',
           'clothes.name',
           'clothes.description',
           'clothes.price',
+          'image.url',
         ])
         .getMany();
       return clothes;
