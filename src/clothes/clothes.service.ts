@@ -155,4 +155,33 @@ export class ClothesService {
     }
     return clothe;
   }
+
+  async getClothesVariantsByIdsArray(
+    clothesIds: string[],
+  ): Promise<ClothesVariantEntity[]> {
+    let clothes: ClothesVariantEntity[];
+    try {
+      clothes = await this.variantsRepository.find({
+        where: { id: In(clothesIds) },
+      });
+    } catch (error) {
+      throw new BadRequestException('Error retrieving clothes variants');
+    }
+    if (!clothes || clothes.length === 0) {
+      throw new NotFoundException('No clothes variants found');
+    }
+    return clothes;
+  }
+
+  async getClothesByIdsArray(clothesIds: string[]): Promise<ClothesEntity[]> {
+    let clothes: ClothesEntity[];
+    try {
+      clothes = await this.clothesRepository.find({
+        where: { id: In(clothesIds) },
+      });
+    } catch (error) {
+      throw new BadRequestException('Error retrieving clothes items');
+    }
+    return clothes;
+  }
 }
