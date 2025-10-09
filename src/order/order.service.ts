@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrderEntity } from './entities/order.entity';
 import { AddressEntity } from './entities/address.entity';
@@ -69,6 +73,28 @@ export class OrderService {
       throw new NotFoundException(`Order with ID ${id} not found`);
     }
     return order;
+  }
+
+  async updateOrderStatus(id: string, status: OrderStatus): Promise<any> {
+    try {
+      const order = await this.orderRepository.update(
+        {
+          id,
+        },
+        {
+          status,
+        },
+      );
+      if (order.affected === 0) {
+        throw new NotFoundException(`Order with ID ${id} not found`);
+      }
+      return this.orderRepository.findOne({ where: { id } });
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException('Error updating order status');
+    }
   }
 
   async getOrdersByStatus(status: OrderStatus): Promise<OrderSummary[]> {
