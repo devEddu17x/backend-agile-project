@@ -1,7 +1,9 @@
+import { QuoteEntity } from 'src/quote/entities/quote.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -28,4 +30,7 @@ export class CustomerEntity {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => QuoteEntity, (quote) => quote.customer)
+  quotes: QuoteEntity[];
 }

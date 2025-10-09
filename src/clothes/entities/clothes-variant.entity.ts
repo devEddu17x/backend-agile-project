@@ -3,12 +3,14 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
 import { ClothesEntity } from './clothes.entity';
 import { GenderEntity } from './gender.entity';
 import { SizeEntity } from './size.entity';
+import { QuoteDetailEntity } from 'src/quote/entities/quote-detail.entity';
 
 @Entity('clothes_variant')
 export class ClothesVariantEntity {
@@ -38,4 +40,10 @@ export class ClothesVariantEntity {
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
   additional: number;
+
+  @OneToMany(
+    () => QuoteDetailEntity,
+    (quoteDetail) => quoteDetail.clothesVariant,
+  )
+  quoteDetails: QuoteDetailEntity[];
 }
