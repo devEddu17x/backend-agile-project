@@ -75,7 +75,13 @@ export class QuoteService {
     try {
       const quote = await this.quoteRepository.findOne({
         where: { id },
-        relations: ['customer', 'details', 'details.clothesVariant'],
+        relations: [
+          'customer',
+          'details',
+          'details.clothesVariant',
+          'details.clothesVariant.gender',
+          'details.clothesVariant.size',
+        ],
       });
       if (!quote) {
         throw new NotFoundException(`Quote with ID ${id} not found`);
