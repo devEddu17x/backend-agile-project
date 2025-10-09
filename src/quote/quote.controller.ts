@@ -14,6 +14,8 @@ import { SuperTokensAuthGuard } from 'supertokens-nestjs';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { ROLES } from 'src/auth/constants/roles';
+import { QuoteSummary } from './interfaces/clothes-data.interface';
+import { CreatedClothes } from './interfaces/created-clothes.interface';
 
 @Roles(ROLES.SELLER)
 @UseGuards(SuperTokensAuthGuard, RolesGuard)
@@ -22,14 +24,19 @@ export class QuoteController {
   constructor(private readonly quoteService: QuoteService) {}
 
   @Post()
-  async createQuote(@Body() dto: CreateQuoteDTO): Promise<any> {
+  async createQuote(@Body() dto: CreateQuoteDTO): Promise<CreatedClothes> {
     return this.quoteService.createQuote(dto);
+  }
+
+  @Get()
+  async getAllQuotes(): Promise<QuoteSummary[]> {
+    return this.quoteService.getAll();
   }
 
   @Get()
   async getQuotesByStatus(
     @Query('status', new ParseEnumPipe(QuoteStatus)) status: QuoteStatus,
-  ) {
+  ): Promise<QuoteSummary[]> {
     return this.quoteService.getQuotesByStatus(status);
   }
 }

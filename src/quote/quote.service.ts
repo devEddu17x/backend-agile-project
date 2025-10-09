@@ -13,6 +13,8 @@ import { DataSource } from 'typeorm';
 import { ClothesService } from 'src/clothes/clothes.service';
 import { ClothesPrice } from './interfaces/clothes-price.interface';
 import { QuoteStatus } from './enums/status.enum';
+import { QuoteSummary } from './interfaces/clothes-data.interface';
+import { CreatedClothes } from './interfaces/created-clothes.interface';
 
 @Injectable()
 export class QuoteService {
@@ -26,10 +28,9 @@ export class QuoteService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async createQuote(dto: CreateQuoteDTO): Promise<any> {
+  async createQuote(dto: CreateQuoteDTO): Promise<CreatedClothes> {
     const customer = await this.customerService.getCustomerById(dto.customerId);
     const variantsPrice = await this.getDetailUnitPrice(dto);
-    console.log(variantsPrice);
     const total = this.calculateTotal(variantsPrice);
     const queryRunner = this.dataSource.createQueryRunner();
     try {
@@ -43,7 +44,6 @@ export class QuoteService {
         }),
       );
 
-      console.log(newQuote);
       const detailsToSave = variantsPrice.map((vp) => {
         return this.quoteDetailRepository.create({
           quoteId: newQuote.id,
@@ -52,7 +52,6 @@ export class QuoteService {
           clothesVariantId: vp.variantId,
         });
       });
-      console.log(detailsToSave);
       const savedDetails = await queryRunner.manager.save(
         QuoteDetailEntity,
         detailsToSave,
@@ -60,7 +59,6 @@ export class QuoteService {
       await queryRunner.commitTransaction();
       return { ...newQuote, details: savedDetails };
     } catch (error) {
-      console.log(error);
       await queryRunner.rollbackTransaction();
       throw new BadRequestException('Error creating quote');
     } finally {
@@ -68,21 +66,112 @@ export class QuoteService {
     }
   }
 
-  async getQuotesByStatus(status: QuoteStatus): Promise<QuoteEntity[]> {
-    let quotes: QuoteEntity[] = [];
+  async getAll(): Promise<QuoteSummary[]> {
+    return this.fetchQuotes();
+  }
+
+  async getQuotesByStatus(status: QuoteStatus): Promise<QuoteSummary[]> {
+    return this.fetchQuotes(status);
+  }
+
+  /**
+   * Private method that builds and executes the query to fetch quotes
+   * @param status - Optional. Filter by specific status
+   * @returns Array of quotes with summary
+   */
+  private async fetchQuotes(status?: QuoteStatus): Promise<QuoteSummary[]> {
     try {
-      quotes = await this.quoteRepository.find({
-        where: { status },
-        relations: { customer: true, details: true },
-        order: { createdAt: 'DESC' },
-      });
+      // Build base query
+      const queryBuilder = this.buildQuoteSummaryQuery();
+
+      // Apply status filter if provided
+      if (status) {
+        queryBuilder.where('quote.status = :status', { status });
+      }
+
+      // Execute query
+      const quotes = await queryBuilder.getRawAndEntities();
+
+      // Map results
+      const result = this.mapToQuoteSummary(quotes);
+
+      if (!result || result.length === 0) {
+        const message = status
+          ? `No quotes found for status: ${status}`
+          : 'No quotes found';
+        throw new NotFoundException(message);
+      }
+
+      return result;
     } catch (error) {
-      throw new BadRequestException('Error fetching quotes by status');
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException('Error fetching quotes');
     }
-    if (!quotes || quotes.length === 0) {
-      throw new NotFoundException('No quotes found for the given status');
-    }
-    return quotes;
+  }
+
+  /**
+   * Builds query builder base to get quote summary
+   * @returns Configured QueryBuilder
+   */
+  private buildQuoteSummaryQuery() {
+    return (
+      this.quoteRepository
+        .createQueryBuilder('quote')
+        .leftJoinAndSelect('quote.customer', 'customer')
+        .leftJoin('quote.details', 'detail')
+        .leftJoin('detail.clothesVariant', 'variant')
+        .select([
+          // Quote fields
+          'quote.id',
+          'quote.total',
+          'quote.customerId',
+          'quote.status',
+          'quote.createdAt',
+          'quote.updatedAt',
+          // Customer fields
+          'customer.id',
+          'customer.names',
+          'customer.lastNames',
+          'customer.phone',
+        ])
+        // Total unique base garments involved
+        .addSelect('COUNT(DISTINCT variant.clothes_id)', 'totalClothes')
+        // Total units to produce (sum of quantities)
+        .addSelect('COALESCE(SUM(detail.quantity), 0)', 'totalUnitsToProduced')
+        .groupBy('quote.id')
+        .addGroupBy('customer.id')
+        .orderBy('quote.createdAt', 'DESC')
+    );
+  }
+
+  /**
+   * Maps the results of the query to the QuoteSummary interface
+   * @param quotes - Result of getRawAndEntities()
+   * @returns Array of QuoteSummary
+   */
+  private mapToQuoteSummary(quotes: {
+    entities: QuoteEntity[];
+    raw: any[];
+  }): QuoteSummary[] {
+    return quotes.entities.map((quote, index) => ({
+      id: quote.id,
+      total: quote.total,
+      customerId: quote.customerId,
+      status: quote.status,
+      createdAt: quote.createdAt,
+      updatedAt: quote.updatedAt,
+      customer: {
+        id: quote.customer.id,
+        names: quote.customer.names,
+        lastNames: quote.customer.lastNames,
+        phone: quote.customer.phone,
+      },
+      totalClothes: parseInt(quotes.raw[index].totalClothes) || 0,
+      totalUnitsToProduced:
+        parseInt(quotes.raw[index].totalUnitsToProduced) || 0,
+    }));
   }
 
   private async getDetailUnitPrice(
