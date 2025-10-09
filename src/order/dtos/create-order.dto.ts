@@ -12,7 +12,7 @@ export class AddressDTO {
   @IsNotEmpty()
   @IsString()
   @MaxLength(100)
-  departamento: string;
+  department: string;
 
   @IsNotEmpty()
   @IsString()

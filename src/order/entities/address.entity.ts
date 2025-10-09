@@ -6,7 +6,7 @@ export class AddressEntity {
   id: string;
 
   @Column({ type: 'varchar', length: 100, nullable: false })
-  departamento: string;
+  department: string;
 
   @Column({ type: 'varchar', length: 100, nullable: false })
   city: string;
