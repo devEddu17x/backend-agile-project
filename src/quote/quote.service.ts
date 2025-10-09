@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QuoteEntity } from './entities/quote.entity';
 import { Repository } from 'typeorm/repository/Repository';
@@ -8,6 +12,7 @@ import { CustomerService } from 'src/customer/customer.service';
 import { DataSource } from 'typeorm';
 import { ClothesService } from 'src/clothes/clothes.service';
 import { ClothesPrice } from './interfaces/clothes-price.interface';
+import { QuoteStatus } from './enums/status.enum';
 
 @Injectable()
 export class QuoteService {
@@ -61,6 +66,23 @@ export class QuoteService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async getQuotesByStatus(status: QuoteStatus): Promise<QuoteEntity[]> {
+    let quotes: QuoteEntity[] = [];
+    try {
+      quotes = await this.quoteRepository.find({
+        where: { status },
+        relations: { customer: true, details: true },
+        order: { createdAt: 'DESC' },
+      });
+    } catch (error) {
+      throw new BadRequestException('Error fetching quotes by status');
+    }
+    if (!quotes || quotes.length === 0) {
+      throw new NotFoundException('No quotes found for the given status');
+    }
+    return quotes;
   }
 
   private async getDetailUnitPrice(
