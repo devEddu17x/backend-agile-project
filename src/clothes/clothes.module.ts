@@ -22,5 +22,6 @@ import { ClotheImageEntity } from './entities/images.entity';
   ],
   providers: [ClothesService],
   controllers: [ClothesController],
+  exports: [ClothesService],
 })
 export class ClothesModule {}

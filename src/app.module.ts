@@ -11,6 +11,7 @@ import { ClothesModule } from './clothes/clothes.module';
 import { AdminModule } from './admin/admin.module';
 import { LoggerModule } from 'nestjs-pino';
 import { StorageModule } from './storage/storage.module';
+import { QuoteModule } from './quote/quote.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { StorageModule } from './storage/storage.module';
     ClothesModule,
     AdminModule,
     StorageModule,
+    QuoteModule,
   ],
 
   controllers: [AppController],

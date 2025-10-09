@@ -38,4 +38,17 @@ export class CustomerService {
     }
     return customers;
   }
+
+  async getCustomerById(id: string): Promise<CustomerEntity> {
+    let customer: CustomerEntity;
+    try {
+      customer = await this.customerRepository.findOne({ where: { id } });
+    } catch (error) {
+      throw new BadRequestException('Error retrieving customer');
+    }
+    if (!customer) {
+      throw new NotFoundException('Customer not found');
+    }
+    return customer;
+  }
 }
