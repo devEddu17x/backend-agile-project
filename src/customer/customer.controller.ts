@@ -9,7 +9,7 @@ import { CustomerEntity } from './entities/customer.entity';
 
 @Roles(ROLES.SELLER)
 @UseGuards(SuperTokensAuthGuard, RolesGuard)
-@Controller('customer')
+@Controller('customers')
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
   @Post()
