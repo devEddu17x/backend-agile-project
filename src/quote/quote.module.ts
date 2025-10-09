@@ -15,5 +15,6 @@ import { QuoteEntity } from './entities/quote.entity';
   ],
   providers: [QuoteService],
   controllers: [QuoteController],
+  exports: [QuoteService],
 })
 export class QuoteModule {}

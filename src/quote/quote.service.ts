@@ -95,6 +95,30 @@ export class QuoteService {
     }
   }
 
+  async updateStatus(id: string, status: QuoteStatus): Promise<QuoteEntity> {
+    try {
+      const updateResult = await this.quoteRepository.update(
+        { id },
+        { status },
+      );
+      if (updateResult.affected === 0) {
+        throw new NotFoundException('Quote not found');
+      }
+      const updatedQuote = await this.quoteRepository.findOne({
+        where: { id },
+      });
+      if (!updatedQuote) {
+        throw new NotFoundException('Quote not found after update');
+      }
+      return updatedQuote;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException('Error updating quote status');
+    }
+  }
+
   async getQuotesByStatus(status: QuoteStatus): Promise<QuoteSummary[]> {
     return this.fetchQuotes(status);
   }
