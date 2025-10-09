@@ -17,7 +17,7 @@ export class ClothesEntity {
   @Column({ type: 'varchar', length: 120, nullable: false })
   name: string;
 
-  @Column({ type: 'text', nullable: false })
+  @Column({ type: 'text', nullable: true })
   description: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })

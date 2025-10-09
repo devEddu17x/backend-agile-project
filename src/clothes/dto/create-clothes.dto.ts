@@ -16,7 +16,7 @@ export class CreateClothesDTO {
   @IsString()
   name: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   description: string;
 
