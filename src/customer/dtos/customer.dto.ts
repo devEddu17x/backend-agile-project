@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsString, MaxLength, Length } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  MaxLength,
+  Length,
+  IsOptional,
+} from 'class-validator';
 
 export class CreateCustomerDTO {
   @IsString()
@@ -11,8 +17,8 @@ export class CreateCustomerDTO {
   @MaxLength(100)
   lastNames: string;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   @MaxLength(100)
   reference: string;
 

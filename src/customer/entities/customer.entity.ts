@@ -19,7 +19,7 @@ export class CustomerEntity {
   @Column({ type: 'varchar', length: 100, nullable: false })
   lastNames: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: false })
+  @Column({ type: 'varchar', length: 100, nullable: true })
   reference: string;
 
   @Column({ type: 'varchar', length: 20, nullable: false })
