@@ -38,7 +38,13 @@ export class ClothesVariantEntity {
   @JoinColumn({ name: 'gender_id', referencedColumnName: 'id' })
   gender: GenderEntity;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    nullable: false,
+    default: 0,
+  })
   additional: number;
 
   @OneToMany(
