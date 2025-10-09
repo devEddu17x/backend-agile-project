@@ -2,8 +2,11 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   ParseEnumPipe,
+  ParseUUIDPipe,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -16,16 +19,25 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { ROLES } from 'src/auth/constants/roles';
 import { QuoteSummary } from './interfaces/clothes-data.interface';
 import { CreatedClothes } from './interfaces/created-clothes.interface';
+import { UpdateQuoteDTO } from './dtos/update-quote.dto';
+import { QuoteEntity } from './entities/quote.entity';
 
 @Roles(ROLES.SELLER)
 @UseGuards(SuperTokensAuthGuard, RolesGuard)
-@Controller('quote')
+@Controller('quotes')
 export class QuoteController {
   constructor(private readonly quoteService: QuoteService) {}
 
   @Post()
   async createQuote(@Body() dto: CreateQuoteDTO): Promise<CreatedClothes> {
     return this.quoteService.createQuote(dto);
+  }
+
+  @Get(':id')
+  async getQuoteById(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<QuoteEntity> {
+    return this.quoteService.getQuoteById(id);
   }
 
   @Get()
@@ -38,5 +50,10 @@ export class QuoteController {
     @Query('status', new ParseEnumPipe(QuoteStatus)) status: QuoteStatus,
   ): Promise<QuoteSummary[]> {
     return this.quoteService.getQuotesByStatus(status);
+  }
+
+  @Put()
+  async updateQuote(@Body() dto: UpdateQuoteDTO): Promise<CreatedClothes> {
+    return this.quoteService.updateQuote(dto);
   }
 }

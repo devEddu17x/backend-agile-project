@@ -15,6 +15,7 @@ import { ClothesPrice } from './interfaces/clothes-price.interface';
 import { QuoteStatus } from './enums/status.enum';
 import { QuoteSummary } from './interfaces/clothes-data.interface';
 import { CreatedClothes } from './interfaces/created-clothes.interface';
+import { UpdateQuoteDTO } from './dtos/update-quote.dto';
 
 @Injectable()
 export class QuoteService {
@@ -70,8 +71,94 @@ export class QuoteService {
     return this.fetchQuotes();
   }
 
+  async getQuoteById(id: string): Promise<QuoteEntity> {
+    try {
+      const quote = await this.quoteRepository.findOne({
+        where: { id },
+        relations: ['customer', 'details', 'details.clothesVariant'],
+      });
+      if (!quote) {
+        throw new NotFoundException(`Quote with ID ${id} not found`);
+      }
+      return quote;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException(`Error fetching quote with ID ${id}`);
+    }
+  }
+
   async getQuotesByStatus(status: QuoteStatus): Promise<QuoteSummary[]> {
     return this.fetchQuotes(status);
+  }
+
+  async updateQuote(dto: UpdateQuoteDTO): Promise<CreatedClothes> {
+    // Verificar que la cotización existe
+    const existingQuote = await this.quoteRepository.findOne({
+      where: { id: dto.id },
+      relations: ['customer'],
+    });
+
+    if (!existingQuote) {
+      throw new NotFoundException(`Quote with ID ${dto.id} not found`);
+    }
+
+    // Calcular precios de las nuevas variantes (reutiliza lógica de createQuote)
+    const variantsPrice = await this.getDetailUnitPrice({
+      details: dto.details,
+      customerId: existingQuote.customerId, // Necesario para la validación
+    } as CreateQuoteDTO);
+
+    const newTotal = this.calculateTotal(variantsPrice);
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      // 1. Eliminar todos los detalles existentes
+      await queryRunner.manager.delete(QuoteDetailEntity, {
+        quoteId: dto.id,
+      });
+
+      // 2. Actualizar el total de la cotización
+      await queryRunner.manager.update(
+        QuoteEntity,
+        { id: dto.id },
+        { total: newTotal },
+      );
+
+      // 3. Crear los nuevos detalles
+      const newDetailsToSave = variantsPrice.map((vp) => {
+        return this.quoteDetailRepository.create({
+          quoteId: dto.id,
+          unitPrice: vp.unitPrice,
+          quantity: vp.quantity,
+          clothesVariantId: vp.variantId,
+        });
+      });
+
+      const savedDetails = await queryRunner.manager.save(
+        QuoteDetailEntity,
+        newDetailsToSave,
+      );
+
+      await queryRunner.commitTransaction();
+
+      // 4. Obtener la cotización actualizada con todos sus datos
+      const updatedQuote = await this.quoteRepository.findOne({
+        where: { id: dto.id },
+      });
+
+      return { ...updatedQuote, details: savedDetails };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      console.error('Error updating quote:', error);
+      throw new BadRequestException('Error updating quote');
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   /**
