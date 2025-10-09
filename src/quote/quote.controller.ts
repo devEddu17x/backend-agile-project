@@ -1,9 +1,9 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
   Param,
-  ParseEnumPipe,
   ParseUUIDPipe,
   Post,
   Put,
@@ -33,23 +33,27 @@ export class QuoteController {
     return this.quoteService.createQuote(dto);
   }
 
+  @Get()
+  async getQuotes(
+    @Query('status') status?: QuoteStatus,
+  ): Promise<QuoteSummary[]> {
+    if (!status) {
+      return this.quoteService.getAll();
+    }
+    // Validar que sea un valor válido del enum
+    if (!Object.values(QuoteStatus).includes(status)) {
+      throw new BadRequestException(
+        `Invalid status. Valid values: ${Object.values(QuoteStatus).join(', ')}`,
+      );
+    }
+    return this.quoteService.getQuotesByStatus(status);
+  }
+
   @Get(':id')
   async getQuoteById(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<QuoteEntity> {
     return this.quoteService.getQuoteById(id);
-  }
-
-  @Get()
-  async getAllQuotes(): Promise<QuoteSummary[]> {
-    return this.quoteService.getAll();
-  }
-
-  @Get()
-  async getQuotesByStatus(
-    @Query('status', new ParseEnumPipe(QuoteStatus)) status: QuoteStatus,
-  ): Promise<QuoteSummary[]> {
-    return this.quoteService.getQuotesByStatus(status);
   }
 
   @Put()
