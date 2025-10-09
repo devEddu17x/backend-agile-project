@@ -6,6 +6,8 @@ import { ClotheImageEntity } from 'src/clothes/entities/images.entity';
 import { SizeEntity } from 'src/clothes/entities/size.entity';
 import { CustomerEntity } from 'src/customer/entities/customer.entity';
 import { EmployeeEntity } from 'src/employee/entities/employee.entity';
+import { AddressEntity } from 'src/order/entities/address.entity';
+import { OrderEntity } from 'src/order/entities/order.entity';
 import { QuoteDetailEntity } from 'src/quote/entities/quote-detail.entity';
 import { QuoteEntity } from 'src/quote/entities/quote.entity';
 
@@ -49,6 +51,8 @@ export default registerAs('typeorm', () => {
       GenderEntity,
       QuoteEntity,
       QuoteDetailEntity,
+      OrderEntity,
+      AddressEntity,
     ],
     synchronize: process.env.NODE_ENV !== 'production',
     ssl:
