@@ -13,7 +13,7 @@ import UserMetadata from 'supertokens-node/recipe/usermetadata';
       useFactory: (configService: ConfigService) => ({
         ...configService.get('supertokens'),
         recipeList: [
-          buildEmailPasswordRecipe(),
+          buildEmailPasswordRecipe({ config: configService }),
           buildSessionRecipe({ config: configService }),
           UserRoles.init(),
           UserMetadata.init(),

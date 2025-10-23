@@ -13,6 +13,7 @@ import * as config from './env';
         config.apiConfig,
         config.pinoLoggerConfig,
         config.cloudflare,
+        config.emailConfig,
       ],
     }),
   ],
