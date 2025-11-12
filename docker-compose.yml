@@ -12,7 +12,7 @@ services:
       - 5433:5432
     networks:
       - app_network
-    restart: unless-stopped
+    restart: no
 
   # supertokens core database
   db:
@@ -25,7 +25,7 @@ services:
       - 5432:5432
     networks:
       - app_network
-    restart: unless-stopped
+    restart: no
     healthcheck:
       test:
         [
@@ -52,7 +52,7 @@ services:
       API_KEYS: ${API_KEY}
     networks:
       - app_network
-    restart: unless-stopped
+    restart: no
     healthcheck:
       test: >
         bash -c 'exec 3<>/dev/tcp/127.0.0.1/3567 && echo -e "GET /hello HTTP/1.1\r\nhost: 127.0.0.1:3567\r\nConnection: close\r\n\r\n" >&3 && cat <&3 | grep "Hello"'
