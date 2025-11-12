@@ -4,7 +4,11 @@ import * as config from './env';
 @Module({
   imports: [
     NestConfigModule.forRoot({
-      envFilePath: ['.env.local', '.env'],
+      envFilePath: [
+        '.env.local',
+        '.env.development.local',
+        '.env.production.local',
+      ],
       isGlobal: true,
       load: [
         config.supertokensConfig,
