@@ -9,7 +9,6 @@ import { CustomerModule } from './customer/customer.module';
 import { EmployeeModule } from './employee/employee.module';
 import { ClothesModule } from './clothes/clothes.module';
 import { AdminModule } from './admin/admin.module';
-import { LoggerModule } from 'nestjs-pino';
 import { StorageModule } from './storage/storage.module';
 import { QuoteModule } from './quote/quote.module';
 import { OrderModule } from './order/order.module';
@@ -19,12 +18,6 @@ import { OrderModule } from './order/order.module';
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => {
         return configService.get('typeorm');
-      },
-      inject: [ConfigService],
-    }),
-    LoggerModule.forRootAsync({
-      useFactory(configService: ConfigService) {
-        return configService.get('pino-logger');
       },
       inject: [ConfigService],
     }),
