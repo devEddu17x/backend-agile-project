@@ -20,7 +20,14 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "test:db:up": "docker-compose -f docker-compose.test.yml up -d",
+    "test:db:down": "docker-compose -f docker-compose.test.yml down",
+    "test:db:reset": "docker-compose -f docker-compose.test.yml down -v && docker-compose -f docker-compose.test.yml up -d",
+    "pretest:e2e": "docker-compose -f docker-compose.test.yml up -d && sleep 5",
+    "test:e2e": "NODE_ENV=local jest --config ./test/jest-e2e.json --runInBand",
+    "test:e2e:watch": "NODE_ENV=local jest --config ./test/jest-e2e.json --watch",
+    "posttest:e2e": "docker-compose -f docker-compose.test.yml down"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.901.0",
