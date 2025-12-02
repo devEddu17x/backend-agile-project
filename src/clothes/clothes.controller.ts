@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -16,6 +17,7 @@ import { ROLES } from 'src/auth/constants/roles';
 import { CreatedClothes } from './interfaces/created-clothes.interface';
 import { StorageService } from 'src/storage/storage.service';
 import { PresignedPut } from 'src/storage/interfaces/presigned-url.interface';
+import { UpdateClothesDTO } from './dto/update-clothes.dto';
 
 @UseGuards(SuperTokensAuthGuard, RolesGuard)
 @Controller('clothes')
@@ -62,5 +64,14 @@ export class ClothesController {
     @Param('id', ParseUUIDPipe) clothesId: string,
   ): Promise<any> {
     return this.clothesService.getClothesById(clothesId);
+  }
+
+  @Roles(ROLES.ADMIN)
+  @Patch(':id')
+  async updateClothes(
+    @Param('id', ParseUUIDPipe) clothesId: string,
+    @Body() updateClothesDto: UpdateClothesDTO,
+  ): Promise<any> {
+    return this.clothesService.updateClothes(clothesId, updateClothesDto);
   }
 }
