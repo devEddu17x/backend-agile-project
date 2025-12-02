@@ -7,6 +7,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ClothesService } from './services/clothes.service';
@@ -66,6 +67,21 @@ export class ClothesController {
   @Get()
   async getAllClothes(): Promise<any> {
     return this.clothesService.getAllClothes();
+  }
+
+  @Get('search')
+  async searchAndFilterClothes(
+    @Query('name') name?: string,
+    @Query('description') description?: string,
+    @Query('size') size?: string,
+    @Query('gender') gender?: string,
+  ): Promise<any> {
+    return this.clothesService.searchAndFilterClothes(
+      name,
+      description,
+      size,
+      gender,
+    );
   }
 
   @Get(':id')
