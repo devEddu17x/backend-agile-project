@@ -12,6 +12,7 @@ import { SizeEntity } from './entities/size.entity';
 import { GenderEntity } from './entities/gender.entity';
 import { CreatedClothes } from './interfaces/created-clothes.interface';
 import { ClotheImageEntity } from './entities/images.entity';
+import { UpdateClothesDTO } from './dto/update-clothes.dto';
 
 @Injectable()
 export class ClothesService {
@@ -196,5 +197,33 @@ export class ClothesService {
       throw new BadRequestException('Error retrieving clothes items');
     }
     return clothes;
+  }
+
+  async updateClothes(
+    clothesId: string,
+    updateData: UpdateClothesDTO,
+  ): Promise<ClothesEntity> {
+    const clothe = await this.clothesRepository.findOne({
+      where: { id: clothesId },
+    });
+
+    if (!clothe) {
+      throw new NotFoundException('Clothes item not found');
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      throw new BadRequestException('No fields to update');
+    }
+
+    try {
+      await this.clothesRepository.update(clothesId, updateData);
+
+      return await this.clothesRepository.findOne({
+        where: { id: clothesId },
+      });
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException('Error updating clothes item');
+    }
   }
 }
