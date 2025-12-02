@@ -141,21 +141,20 @@ export class ClothesService {
         .leftJoinAndSelect('variant.gender', 'gender')
         .leftJoinAndSelect('clothes.clothe_image', 'image')
         .select([
-          // Clothes fields
           'clothes.id',
           'clothes.name',
           'clothes.description',
           'clothes.price',
           'clothes.createdAt',
           'clothes.updatedAt',
-          // Variant
+
           'variant.additional',
           'variant.id',
-          // Size
+
           'size.size',
-          // Gender
+
           'gender.gender',
-          // Image fields
+
           'image.url',
         ])
         .where('clothes.id = :clothesId', { clothesId })
