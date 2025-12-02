@@ -9,7 +9,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ClothesService } from './clothes.service';
+import { ClothesService } from './services/clothes.service';
 import { CreateClothesDTO } from './dto/create-clothes.dto';
 import { SuperTokensAuthGuard } from 'supertokens-nestjs';
 import { RolesGuard } from 'src/auth/guards/roles.guard';

@@ -10,7 +10,7 @@ import { QuoteDetailEntity } from './entities/quote-detail.entity';
 import { CreateQuoteDTO } from './dtos/create-quote.dto';
 import { CustomerService } from 'src/customer/customer.service';
 import { DataSource } from 'typeorm';
-import { ClothesService } from 'src/clothes/clothes.service';
+import { ClothesService } from 'src/clothes/services/clothes.service';
 import { ClothesPrice } from './interfaces/clothes-price.interface';
 import { QuoteStatus } from './enums/status.enum';
 import { QuoteSummary } from './interfaces/clothes-data.interface';

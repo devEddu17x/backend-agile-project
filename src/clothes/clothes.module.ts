@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ClothesService } from './clothes.service';
+import { ClothesService } from './services/clothes.service';
 import { ClothesController } from './clothes.controller';
 import { ClothesEntity } from './entities/clothes.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
