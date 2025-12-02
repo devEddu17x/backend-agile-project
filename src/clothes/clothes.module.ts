@@ -8,6 +8,7 @@ import { GenderEntity } from './entities/gender.entity';
 import { SizeEntity } from './entities/size.entity';
 import { StorageModule } from 'src/storage/storage.module';
 import { ClotheImageEntity } from './entities/images.entity';
+import { QuoteDetailEntity } from 'src/quote/entities/quote-detail.entity';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ClotheImageEntity } from './entities/images.entity';
       ClothesEntity,
       ClothesVariantEntity,
       ClotheImageEntity,
+      QuoteDetailEntity,
     ]),
     StorageModule,
   ],
