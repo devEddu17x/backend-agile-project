@@ -16,6 +16,8 @@ import { UpdateClothesDTO } from './dto/update-clothes.dto';
 import { Variant } from './dto/variants.dto';
 import { UpdateVariantDTO } from './dto/update-variant.dto';
 import { QuoteDetailEntity } from 'src/quote/entities/quote-detail.entity';
+import { StorageService } from 'src/storage/storage.service';
+import { AllowedImagesDTO } from './dto/images.dto';
 
 @Injectable()
 export class ClothesService {
@@ -33,6 +35,7 @@ export class ClothesService {
     @InjectRepository(QuoteDetailEntity)
     private readonly quoteDetailRepository: Repository<QuoteDetailEntity>,
     private readonly dataSource: DataSource,
+    private readonly storageService: StorageService,
   ) {}
 
   async addNewClothesItem(clothes: CreateClothesDTO): Promise<CreatedClothes> {
@@ -370,6 +373,96 @@ export class ClothesService {
     } catch (error) {
       console.log(error);
       throw new BadRequestException('Error deleting variant');
+    }
+  }
+
+  async addNewImagesToClothes(
+    clothesId: string,
+    images: AllowedImagesDTO[],
+  ): Promise<{ imageUrls: string[]; preSignedPuts: any[] }> {
+    const clothe = await this.clothesRepository.findOne({
+      where: { id: clothesId },
+    });
+
+    if (!clothe) {
+      throw new NotFoundException('Clothes item not found');
+    }
+
+    try {
+      const preSignedPuts = await this.storageService.createPresignedPuts(
+        clothesId,
+        images,
+        {
+          ttlSeconds: 3600,
+          cacheControl: 'no-cache',
+        },
+      );
+
+      const keys = preSignedPuts.map((put) => put.key);
+      const imageUrls = this.storageService.getImagesUrl(keys);
+
+      const savedImages = await this.addImagesToClothes(clothesId, imageUrls);
+
+      if (!savedImages || savedImages.length === 0) {
+        throw new BadRequestException('Error saving images');
+      }
+
+      return {
+        imageUrls,
+        preSignedPuts,
+      };
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException('Error adding images to clothes item');
+    }
+  }
+
+  async deleteImageFromClothes(
+    clothesId: string,
+    imageUrl: string,
+  ): Promise<{ message: string }> {
+    const clothe = await this.clothesRepository.findOne({
+      where: { id: clothesId },
+    });
+
+    if (!clothe) {
+      throw new NotFoundException('Clothes item not found');
+    }
+
+    const image = await this.imageRepository.findOne({
+      where: {
+        url: imageUrl,
+        clothesId: clothesId,
+      },
+    });
+
+    if (!image) {
+      throw new NotFoundException(
+        'Image not found or does not belong to this clothes item',
+      );
+    }
+
+    try {
+      const key = this.storageService.extractKeyFromUrl(imageUrl);
+
+      if (!key) {
+        throw new BadRequestException('Invalid image URL');
+      }
+
+      const deleted = await this.storageService.deleteObject(key);
+
+      if (!deleted) {
+        console.warn(`Failed to delete image from S3: ${key}`);
+      }
+
+      await this.imageRepository.delete(image.id);
+
+      return {
+        message: 'Image deleted successfully',
+      };
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException('Error deleting image');
     }
   }
 }
