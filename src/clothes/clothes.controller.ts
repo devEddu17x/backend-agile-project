@@ -23,12 +23,16 @@ import { Variant } from './dto/variants.dto';
 import { UpdateVariantDTO } from './dto/update-variant.dto';
 import { AddImagesToClothesDTO } from './dto/add-images.dto';
 import { DeleteImageDTO } from './dto/delete-image.dto';
+import { ClothesVariantsService } from './services/clothes-variants.service';
+import { ClothesImagesService } from './services/clothes-images.service';
 
 @UseGuards(SuperTokensAuthGuard, RolesGuard)
 @Controller('clothes')
 export class ClothesController {
   constructor(
     private readonly clothesService: ClothesService,
+    private readonly clothesVariantService: ClothesVariantsService,
+    private readonly clothesImagesService: ClothesImagesService,
     private readonly storageService: StorageService,
   ) {}
 
@@ -49,7 +53,7 @@ export class ClothesController {
 
     const keys = preSignedPuts.map((put) => put.key);
     const imageUrls = this.storageService.getImagesUrl(keys);
-    const savedImages = await this.clothesService.addImagesToClothes(
+    const savedImages = await this.clothesImagesService.addImagesToClothes(
       createdClothes.id,
       imageUrls,
     );
@@ -86,7 +90,10 @@ export class ClothesController {
     @Param('id', ParseUUIDPipe) clothesId: string,
     @Body() variantDto: Variant,
   ): Promise<any> {
-    return this.clothesService.addVariantToClothes(clothesId, variantDto);
+    return this.clothesVariantService.addVariantToClothes(
+      clothesId,
+      variantDto,
+    );
   }
 
   @Roles(ROLES.ADMIN)
@@ -96,7 +103,7 @@ export class ClothesController {
     @Param('variantId', ParseUUIDPipe) variantId: string,
     @Body() updateVariantDto: UpdateVariantDTO,
   ): Promise<any> {
-    return this.clothesService.updateVariant(
+    return this.clothesVariantService.updateVariant(
       clothesId,
       variantId,
       updateVariantDto,
@@ -109,7 +116,7 @@ export class ClothesController {
     @Param('id', ParseUUIDPipe) clothesId: string,
     @Param('variantId', ParseUUIDPipe) variantId: string,
   ): Promise<any> {
-    return this.clothesService.deleteVariant(clothesId, variantId);
+    return this.clothesVariantService.deleteVariant(clothesId, variantId);
   }
 
   @Roles(ROLES.ADMIN)
@@ -118,7 +125,7 @@ export class ClothesController {
     @Param('id', ParseUUIDPipe) clothesId: string,
     @Body() addImagesDto: AddImagesToClothesDTO,
   ): Promise<any> {
-    return this.clothesService.addNewImagesToClothes(
+    return this.clothesImagesService.addNewImagesToClothes(
       clothesId,
       addImagesDto.images,
     );
@@ -130,7 +137,7 @@ export class ClothesController {
     @Param('id', ParseUUIDPipe) clothesId: string,
     @Body() deleteImageDto: DeleteImageDTO,
   ): Promise<any> {
-    return this.clothesService.deleteImageFromClothes(
+    return this.clothesImagesService.deleteImageFromClothes(
       clothesId,
       deleteImageDto.url,
     );
