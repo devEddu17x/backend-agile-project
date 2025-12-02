@@ -5,19 +5,19 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
-import { ClothesEntity } from './entities/clothes.entity';
-import { CreateClothesDTO } from './dto/create-clothes.dto';
-import { ClothesVariantEntity } from './entities/clothes-variant.entity';
-import { SizeEntity } from './entities/size.entity';
-import { GenderEntity } from './entities/gender.entity';
-import { CreatedClothes } from './interfaces/created-clothes.interface';
-import { ClotheImageEntity } from './entities/images.entity';
-import { UpdateClothesDTO } from './dto/update-clothes.dto';
-import { Variant } from './dto/variants.dto';
-import { UpdateVariantDTO } from './dto/update-variant.dto';
+import { ClothesEntity } from '../entities/clothes.entity';
+import { CreateClothesDTO } from '../dto/create-clothes.dto';
+import { ClothesVariantEntity } from '../entities/clothes-variant.entity';
+import { SizeEntity } from '../entities/size.entity';
+import { GenderEntity } from '../entities/gender.entity';
+import { CreatedClothes } from '../interfaces/created-clothes.interface';
+import { ClotheImageEntity } from '../entities/images.entity';
+import { UpdateClothesDTO } from '../dto/update-clothes.dto';
+import { Variant } from '../dto/variants.dto';
+import { UpdateVariantDTO } from '../dto/update-variant.dto';
 import { QuoteDetailEntity } from 'src/quote/entities/quote-detail.entity';
 import { StorageService } from 'src/storage/storage.service';
-import { AllowedImagesDTO } from './dto/images.dto';
+import { AllowedImagesDTO } from '../dto/images.dto';
 
 @Injectable()
 export class ClothesService {
