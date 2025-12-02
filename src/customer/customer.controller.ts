@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { CustomerService } from './customer.service';
-import { CreateCustomerDTO } from './dtos/customer.dto';
+import { CreateCustomerDTO } from './dtos/create-customer.dto';
 import { SuperTokensAuthGuard } from 'supertokens-nestjs';
 import { ROLES } from 'src/auth/constants/roles';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
