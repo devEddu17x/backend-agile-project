@@ -193,4 +193,87 @@ export class ClothesService {
       throw new BadRequestException('Error updating clothes item');
     }
   }
+
+  async searchAndFilterClothes(
+    name?: string,
+    description?: string,
+    size?: string,
+    gender?: string,
+  ): Promise<any[]> {
+    try {
+      let query = this.clothesRepository
+        .createQueryBuilder('clothes')
+        .leftJoinAndSelect('clothes.clothes_variant', 'variant')
+        .leftJoinAndSelect('variant.size', 'size')
+        .leftJoinAndSelect('variant.gender', 'gender')
+        .leftJoinAndSelect('clothes.clothe_image', 'image')
+        .select([
+          'clothes.id',
+          'clothes.name',
+          'clothes.description',
+          'clothes.price',
+          'clothes.isInEcommerce',
+          'variant.id',
+          'variant.additional',
+          'size.size',
+          'gender.gender',
+          'image.url',
+        ]);
+
+      let hasCondition = false;
+
+      if (name && name.trim() !== '') {
+        query = query.where('clothes.name ILIKE :name', {
+          name: `%${name.trim()}%`,
+        });
+        hasCondition = true;
+      }
+
+      if (description && description.trim() !== '') {
+        if (hasCondition) {
+          query = query.andWhere('clothes.description ILIKE :description', {
+            description: `%${description.trim()}%`,
+          });
+        } else {
+          query = query.where('clothes.description ILIKE :description', {
+            description: `%${description.trim()}%`,
+          });
+          hasCondition = true;
+        }
+      }
+
+      if (size && size.trim() !== '') {
+        if (hasCondition) {
+          query = query.andWhere('CAST(size.size AS TEXT) ILIKE :size', {
+            size: size.trim(),
+          });
+        } else {
+          query = query.where('CAST(size.size AS TEXT) ILIKE :size', {
+            size: size.trim(),
+          });
+          hasCondition = true;
+        }
+      }
+
+      if (gender && gender.trim() !== '') {
+        if (hasCondition) {
+          query = query.andWhere('CAST(gender.gender AS TEXT) ILIKE :gender', {
+            gender: gender.trim(),
+          });
+        } else {
+          query = query.where('CAST(gender.gender AS TEXT) ILIKE :gender', {
+            gender: gender.trim(),
+          });
+          hasCondition = true;
+        }
+      }
+
+      const clothes = await query.getMany();
+
+      return clothes;
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException('Error searching and filtering clothes');
+    }
+  }
 }
