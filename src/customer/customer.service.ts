@@ -60,4 +60,56 @@ export class CustomerService {
     }
     return this.getCustomerById(id);
   }
+
+  async searchCustomers(
+    names?: string,
+    lastNames?: string,
+    phone?: string,
+  ): Promise<CustomerEntity[]> {
+    if (!names && !lastNames && !phone) {
+      return [];
+    }
+
+    try {
+      let query = this.customerRepository.createQueryBuilder('customer');
+      let hasCondition = false;
+
+      if (names && names.trim() !== '') {
+        query = query.where('customer.names ILIKE :names', {
+          names: `%${names.trim()}%`,
+        });
+        hasCondition = true;
+      }
+
+      if (lastNames && lastNames.trim() !== '') {
+        if (hasCondition) {
+          query = query.andWhere('customer.lastNames ILIKE :lastNames', {
+            lastNames: `%${lastNames.trim()}%`,
+          });
+        } else {
+          query = query.where('customer.lastNames ILIKE :lastNames', {
+            lastNames: `%${lastNames.trim()}%`,
+          });
+          hasCondition = true;
+        }
+      }
+
+      if (phone && phone.trim() !== '') {
+        if (hasCondition) {
+          query = query.andWhere('customer.phone ILIKE :phone', {
+            phone: `%${phone.trim()}%`,
+          });
+        } else {
+          query = query.where('customer.phone ILIKE :phone', {
+            phone: `%${phone.trim()}%`,
+          });
+        }
+      }
+
+      const customers = await query.getMany();
+      return customers;
+    } catch (error) {
+      throw new BadRequestException('Error searching customers');
+    }
+  }
 }
