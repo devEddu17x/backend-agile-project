@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -18,6 +19,8 @@ import { CreatedClothes } from './interfaces/created-clothes.interface';
 import { StorageService } from 'src/storage/storage.service';
 import { PresignedPut } from 'src/storage/interfaces/presigned-url.interface';
 import { UpdateClothesDTO } from './dto/update-clothes.dto';
+import { Variant } from './dto/variants.dto';
+import { UpdateVariantDTO } from './dto/update-variant.dto';
 
 @UseGuards(SuperTokensAuthGuard, RolesGuard)
 @Controller('clothes')
@@ -73,5 +76,37 @@ export class ClothesController {
     @Body() updateClothesDto: UpdateClothesDTO,
   ): Promise<any> {
     return this.clothesService.updateClothes(clothesId, updateClothesDto);
+  }
+
+  @Roles(ROLES.ADMIN)
+  @Post(':id/variants')
+  async addVariant(
+    @Param('id', ParseUUIDPipe) clothesId: string,
+    @Body() variantDto: Variant,
+  ): Promise<any> {
+    return this.clothesService.addVariantToClothes(clothesId, variantDto);
+  }
+
+  @Roles(ROLES.ADMIN)
+  @Patch(':id/variants/:variantId')
+  async updateVariant(
+    @Param('id', ParseUUIDPipe) clothesId: string,
+    @Param('variantId', ParseUUIDPipe) variantId: string,
+    @Body() updateVariantDto: UpdateVariantDTO,
+  ): Promise<any> {
+    return this.clothesService.updateVariant(
+      clothesId,
+      variantId,
+      updateVariantDto,
+    );
+  }
+
+  @Roles(ROLES.ADMIN)
+  @Delete(':id/variants/:variantId')
+  async deleteVariant(
+    @Param('id', ParseUUIDPipe) clothesId: string,
+    @Param('variantId', ParseUUIDPipe) variantId: string,
+  ): Promise<any> {
+    return this.clothesService.deleteVariant(clothesId, variantId);
   }
 }
