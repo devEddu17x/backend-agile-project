@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { CreateCustomerDTO } from './dtos/create-customer.dto';
 import { SuperTokensAuthGuard } from 'supertokens-nestjs';
@@ -6,6 +15,7 @@ import { ROLES } from 'src/auth/constants/roles';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { CustomerEntity } from './entities/customer.entity';
+import { UpdateCustomerDTO } from './dtos/update-customer.dto';
 
 @Roles(ROLES.SELLER)
 @UseGuards(SuperTokensAuthGuard, RolesGuard)
@@ -20,5 +30,13 @@ export class CustomerController {
   @Get()
   async getAllCustomers(): Promise<CustomerEntity[]> {
     return await this.customerService.getAllCustomers();
+  }
+
+  @Patch(':id')
+  async updateCustomer(
+    @Body() customerDTO: UpdateCustomerDTO,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return await this.customerService.updateCustomer(id, customerDTO);
   }
 }

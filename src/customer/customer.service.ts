@@ -7,6 +7,7 @@ import { CreateCustomerDTO } from './dtos/create-customer.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CustomerEntity } from './entities/customer.entity';
 import { Repository } from 'typeorm';
+import { UpdateCustomerDTO } from './dtos/update-customer.dto';
 
 @Injectable()
 export class CustomerService {
@@ -50,5 +51,13 @@ export class CustomerService {
       throw new NotFoundException('Customer not found');
     }
     return customer;
+  }
+
+  async updateCustomer(id: string, customerDTO: UpdateCustomerDTO) {
+    const result = await this.customerRepository.update(id, customerDTO);
+    if (result.affected === 0) {
+      throw new NotFoundException('Customer not found');
+    }
+    return this.getCustomerById(id);
   }
 }
