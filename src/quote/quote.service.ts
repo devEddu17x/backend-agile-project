@@ -16,6 +16,7 @@ import { QuoteStatus } from './enums/status.enum';
 import { QuoteSummary } from './interfaces/clothes-data.interface';
 import { CreatedClothes } from './interfaces/created-clothes.interface';
 import { UpdateQuoteDTO } from './dtos/update-quote.dto';
+import { ClothesVariantsService } from 'src/clothes/services/clothes-variants.service';
 
 @Injectable()
 export class QuoteService {
@@ -26,6 +27,7 @@ export class QuoteService {
     private readonly quoteDetailRepository: Repository<QuoteDetailEntity>,
     private readonly customerService: CustomerService,
     private readonly clothesService: ClothesService,
+    private readonly clothesVariantsService: ClothesVariantsService,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -298,7 +300,9 @@ export class QuoteService {
       ...new Set(dto.details.map((d) => d.clothesVariantId)),
     ];
     const variants =
-      await this.clothesService.getClothesVariantsByIdsArray(uniqueVariantsIds);
+      await this.clothesVariantsService.getClothesVariantsByIdsArray(
+        uniqueVariantsIds,
+      );
 
     const clothesId = [...new Set(variants.map((v) => v.clothesId))];
     const clothes = await this.clothesService.getClothesByIdsArray(clothesId);
