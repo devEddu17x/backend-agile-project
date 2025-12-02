@@ -1,4 +1,5 @@
 import {
+  DeleteObjectCommand,
   HeadObjectCommand,
   PutObjectCommand,
   S3Client,
@@ -75,6 +76,28 @@ export class StorageService {
       );
       return true;
     } catch {
+      return false;
+    }
+  }
+
+  extractKeyFromUrl(url: string): string | null {
+    try {
+      const urlObj = new URL(url);
+      const key = urlObj.pathname.substring(1);
+      return key;
+    } catch {
+      return null;
+    }
+  }
+
+  async deleteObject(key: string): Promise<boolean> {
+    try {
+      await this.s3.send(
+        new DeleteObjectCommand({ Bucket: this.bucket, Key: key }),
+      );
+      return true;
+    } catch (error) {
+      console.error('Error deleting object from S3:', error);
       return false;
     }
   }
