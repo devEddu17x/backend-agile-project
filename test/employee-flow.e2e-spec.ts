@@ -31,8 +31,8 @@ describe('Flujo de Registro de Empleado (e2e)', () => {
     // Crear y loguear admin
     const { cookies } = await createUserWithRole(
       app,
-      'admin@test.com',
-      'Admin123!',
+      process.env.TEST_ADMIN_EMAIL,
+      process.env.TEST_ADMIN_PASSWORD,
       'admin',
     );
     adminCookies = cookies;
@@ -47,7 +47,7 @@ describe('Flujo de Registro de Empleado (e2e)', () => {
     const timestamp = Date.now();
     const employeeData = {
       email: `empleado1-${timestamp}@test.com`,
-      password: 'Empleado123!',
+      password: process.env.TEST_EMPLOYEE_PASSWORD,
       names: 'Juan',
       lastNames: 'Pérez',
     };
@@ -71,7 +71,7 @@ describe('Flujo de Registro de Empleado (e2e)', () => {
       .set('Cookie', adminCookies)
       .send({
         email: 'empleado2@test.com',
-        password: 'Empleado123!',
+        password: process.env.TEST_EMPLOYEE_PASSWORD,
         names: 'Empleado',
         lastNames: 'Original',
       });
@@ -79,7 +79,7 @@ describe('Flujo de Registro de Empleado (e2e)', () => {
     // Intentar crear otro con el mismo email
     const duplicateData = {
       email: 'empleado2@test.com', // Email ya existe
-      password: 'Password123!',
+      password: process.env.TEST_EMPLOYEE_PASSWORD,
       names: 'Pedro',
       lastNames: 'García',
     };
@@ -101,7 +101,7 @@ describe('Flujo de Registro de Empleado (e2e)', () => {
       .set('Cookie', adminCookies)
       .send({
         email: `empleado3-${timestamp}@test.com`,
-        password: 'Empleado123!',
+        password: process.env.TEST_EMPLOYEE_PASSWORD,
         names: 'Carlos',
         lastNames: 'Vendedor',
       });
@@ -112,7 +112,7 @@ describe('Flujo de Registro de Empleado (e2e)', () => {
       .send({
         formFields: [
           { id: 'email', value: `empleado3-${timestamp}@test.com` },
-          { id: 'password', value: 'Empleado123!' },
+          { id: 'password', value: process.env.TEST_EMPLOYEE_PASSWORD },
         ],
       })
       .expect(200);
