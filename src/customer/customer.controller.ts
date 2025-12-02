@@ -6,6 +6,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CustomerService } from './customer.service';
@@ -30,6 +31,15 @@ export class CustomerController {
   @Get()
   async getAllCustomers(): Promise<CustomerEntity[]> {
     return await this.customerService.getAllCustomers();
+  }
+
+  @Get('search')
+  async searchCustomers(
+    @Query('names') names?: string,
+    @Query('lastnames') lastNames?: string,
+    @Query('phone') phone?: string,
+  ): Promise<CustomerEntity[]> {
+    return await this.customerService.searchCustomers(names, lastNames, phone);
   }
 
   @Patch(':id')
