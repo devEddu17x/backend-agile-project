@@ -32,6 +32,17 @@ export class ClothesService {
   async addNewClothesItem(clothes: CreateClothesDTO): Promise<CreatedClothes> {
     const { name, description, price, variants } = clothes;
 
+    const variantKeys = new Set<string>();
+    for (const v of variants) {
+      const key = `${v.size}-${v.gender}`;
+      if (variantKeys.has(key)) {
+        throw new BadRequestException(
+          `Duplicate combination of size and gender: ${v.size} - ${v.gender}`,
+        );
+      }
+      variantKeys.add(key);
+    }
+
     const uniqueSizes = [...new Set(variants.map((v) => v.size))];
     const uniqueGenders = [...new Set(variants.map((v) => v.gender))];
 
