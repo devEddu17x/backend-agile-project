@@ -9,6 +9,8 @@ import { SizeEntity } from './entities/size.entity';
 import { StorageModule } from 'src/storage/storage.module';
 import { ClotheImageEntity } from './entities/images.entity';
 import { QuoteDetailEntity } from 'src/quote/entities/quote-detail.entity';
+import { ClothesVariantsService } from './services/clothes-variants.service';
+import { ClothesImagesService } from './services/clothes-images.service';
 
 @Module({
   imports: [
@@ -22,8 +24,8 @@ import { QuoteDetailEntity } from 'src/quote/entities/quote-detail.entity';
     ]),
     StorageModule,
   ],
-  providers: [ClothesService],
+  providers: [ClothesService, ClothesVariantsService, ClothesImagesService],
   controllers: [ClothesController],
-  exports: [ClothesService],
+  exports: [ClothesService, ClothesVariantsService, ClothesImagesService],
 })
 export class ClothesModule {}
