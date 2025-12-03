@@ -229,6 +229,21 @@ export class ClothesService {
       throw new BadRequestException('No fields to update');
     }
 
+    if (clothe.isInEcommerce && updateData.isDraft === true) {
+      throw new BadRequestException(
+        'Cannot mark as draft a clothes item that is in the e-commerce',
+      );
+    }
+
+    if (
+      clothe.isDraft &&
+      updateData.isDraft === false &&
+      updateData.isInEcommerce === true
+    ) {
+      throw new BadRequestException(
+        'Cannot add a clothes item that is in draft to the e-commerce',
+      );
+    }
     try {
       await this.clothesRepository.update(clothesId, updateData);
 
