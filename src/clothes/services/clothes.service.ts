@@ -177,6 +177,8 @@ export class ClothesService {
           'clothes.price',
           'clothes.createdAt',
           'clothes.updatedAt',
+          'clothes.isDraft',
+          'clothes.isInEcommerce',
 
           'variant.additional',
           'variant.id',
