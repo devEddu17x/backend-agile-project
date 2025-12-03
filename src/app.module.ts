@@ -12,9 +12,16 @@ import { AdminModule } from './admin/admin.module';
 import { StorageModule } from './storage/storage.module';
 import { QuoteModule } from './quote/quote.module';
 import { OrderModule } from './order/order.module';
+import { LoggerModule } from 'nestjs-pino';
 
 @Module({
   imports: [
+    LoggerModule.forRootAsync({
+      useFactory: (configService: ConfigService) => {
+        return configService.get('pino-logger');
+      },
+      inject: [ConfigService],
+    }),
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => {
         return configService.get('typeorm');
