@@ -133,6 +133,38 @@ export class QuoteService {
     return this.fetchQuotes(status);
   }
 
+  async cancelQuote(id: string): Promise<QuoteEntity> {
+    const existingQuote = await this.quoteRepository.findOne({
+      where: { id },
+    });
+
+    if (!existingQuote) {
+      throw new NotFoundException(`Quote with ID ${id} not found`);
+    }
+
+    if (existingQuote.status !== QuoteStatus.PENDING) {
+      throw new BadRequestException(
+        `Only PENDING quotes can be cancelled. Current status: ${existingQuote.status}`,
+      );
+    }
+
+    const updateResult = await this.quoteRepository.update(
+      { id },
+      { status: QuoteStatus.CANCELLED },
+    );
+
+    if (updateResult.affected === 0) {
+      throw new BadRequestException('Error cancelling quote');
+    }
+
+    const cancelledQuote = await this.quoteRepository.findOne({
+      where: { id },
+      relations: ['customer'],
+    });
+
+    return cancelledQuote;
+  }
+
   async updateQuote(id: string, dto: UpdateQuoteDTO): Promise<CreatedClothes> {
     this.validateCustomizations(dto.details);
     this.validateNoDuplicateVariants(dto.details);
@@ -153,7 +185,6 @@ export class QuoteService {
       );
     }
 
-    // Calcular precios de las nuevas variantes (reutiliza lógica de createQuote)
     const variantsPrice = await this.getDetailUnitPrice({
       details: dto.details,
       customerId: existingQuote.customerId,
