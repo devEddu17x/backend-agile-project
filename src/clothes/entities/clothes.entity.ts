@@ -26,6 +26,9 @@ export class ClothesEntity {
   @Column({ type: 'boolean', default: false })
   isInEcommerce: boolean;
 
+  @Column({ type: 'boolean', default: false })
+  isDraft: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 
