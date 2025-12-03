@@ -128,6 +128,12 @@ export class OrderService {
         }
       }
 
+      if (currentOrder.status === OrderStatus.CANCELLED) {
+        throw new BadRequestException(
+          'Cannot change status of an order that is CANCELLED',
+        );
+      }
+
       if (currentOrder.status === OrderStatus.DONE) {
         throw new BadRequestException(
           'Cannot change status of an order that is already DONE',
@@ -152,6 +158,46 @@ export class OrderService {
         throw error;
       }
       throw new BadRequestException('Error updating order status');
+    }
+  }
+
+  async cancelOrder(id: string, reason: string): Promise<OrderEntity> {
+    try {
+      const existingOrder = await this.orderRepository.findOne({
+        where: { id },
+      });
+
+      if (!existingOrder) {
+        throw new NotFoundException(`Order with ID ${id} not found`);
+      }
+
+      if (existingOrder.status !== OrderStatus.IN_PRODUCTION) {
+        throw new BadRequestException(
+          `Only orders in IN_PRODUCTION can be cancelled. Current status: ${existingOrder.status}`,
+        );
+      }
+
+      const updateResult = await this.orderRepository.update(
+        { id },
+        { status: OrderStatus.CANCELLED, cancellationReason: reason },
+      );
+
+      if (updateResult.affected === 0) {
+        throw new BadRequestException('Error cancelling order');
+      }
+
+      const cancelledOrder = await this.orderRepository.findOne({
+        where: { id },
+      });
+      return cancelledOrder;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException('Error cancelling order');
     }
   }
 
