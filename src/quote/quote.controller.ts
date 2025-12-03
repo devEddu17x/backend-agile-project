@@ -56,8 +56,11 @@ export class QuoteController {
     return this.quoteService.getQuoteById(id);
   }
 
-  @Put()
-  async updateQuote(@Body() dto: UpdateQuoteDTO): Promise<CreatedClothes> {
-    return this.quoteService.updateQuote(dto);
+  @Put(':id')
+  async updateQuote(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateQuoteDTO,
+  ): Promise<CreatedClothes> {
+    return this.quoteService.updateQuote(id, dto);
   }
 }
