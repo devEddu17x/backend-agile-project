@@ -43,7 +43,7 @@ export class ClothesController {
     @Body() clothesDto: CreateClothesDTO,
   ): Promise<CreatedClothes & { preSignedPuts: PresignedPut[] }> {
     const createdClothes: CreatedClothes =
-      await this.clothesService.addNewClothesItem(clothesDto);
+      await this.clothesService.createClothe(clothesDto);
 
     const preSignedPuts: PresignedPut[] | [] =
       await this.storageService.createPresignedPuts(
