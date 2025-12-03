@@ -112,20 +112,43 @@ export class OrderService {
 
   async updateOrderStatus(id: string, status: OrderStatus): Promise<any> {
     try {
-      const order = await this.orderRepository.update(
-        {
-          id,
-        },
-        {
-          status,
-        },
-      );
-      if (order.affected === 0) {
+      const currentOrder = await this.orderRepository.findOne({
+        where: { id },
+      });
+
+      if (!currentOrder) {
         throw new NotFoundException(`Order with ID ${id} not found`);
       }
+
+      if (status === OrderStatus.DONE) {
+        if (currentOrder.status !== OrderStatus.IN_PRODUCTION) {
+          throw new BadRequestException(
+            `Cannot change order status to DONE. Order must be in IN_PRODUCTION status. Current status: ${currentOrder.status}`,
+          );
+        }
+      }
+
+      if (currentOrder.status === OrderStatus.DONE) {
+        throw new BadRequestException(
+          'Cannot change status of an order that is already DONE',
+        );
+      }
+
+      const updateResult = await this.orderRepository.update(
+        { id },
+        { status },
+      );
+
+      if (updateResult.affected === 0) {
+        throw new NotFoundException(`Order with ID ${id} not found`);
+      }
+
       return this.orderRepository.findOne({ where: { id } });
     } catch (error) {
       if (error instanceof NotFoundException) {
+        throw error;
+      }
+      if (error instanceof BadRequestException) {
         throw error;
       }
       throw new BadRequestException('Error updating order status');
