@@ -107,6 +107,20 @@ export class QuoteService {
 
   async updateStatus(id: string, status: QuoteStatus): Promise<QuoteEntity> {
     try {
+      const currentQuote = await this.quoteRepository.findOne({
+        where: { id },
+      });
+
+      if (!currentQuote) {
+        throw new NotFoundException('Quote not found');
+      }
+
+      if (currentQuote.status === QuoteStatus.CANCELLED) {
+        throw new BadRequestException(
+          'Cannot change status of a cancelled quote. Cancelled quotes are final.',
+        );
+      }
+
       const updateResult = await this.quoteRepository.update(
         { id },
         { status },
@@ -123,6 +137,9 @@ export class QuoteService {
       return updatedQuote;
     } catch (error) {
       if (error instanceof NotFoundException) {
+        throw error;
+      }
+      if (error instanceof BadRequestException) {
         throw error;
       }
       throw new BadRequestException('Error updating quote status');
