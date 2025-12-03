@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, In, Repository } from 'typeorm';
+import { DataSource, Equal, In, Repository } from 'typeorm';
 import { ClothesEntity } from '../entities/clothes.entity';
 import { CreateClothesDTO } from '../dto/create-clothes.dto';
 import { ClothesVariantEntity } from '../entities/clothes-variant.entity';
@@ -15,6 +15,9 @@ import { ClotheImageEntity } from '../entities/images.entity';
 import { UpdateClothesDTO } from '../dto/update-clothes.dto';
 import { QuoteDetailEntity } from 'src/quote/entities/quote-detail.entity';
 import { StorageService } from 'src/storage/storage.service';
+import { CreateDraftClothesDTO } from '../dto/create-draft-clothes.dto';
+import { CLOTHES_GENDER } from '../enum/gender.enum';
+import { CLOTHES_SIZES } from '../enum/size.enum';
 
 @Injectable()
 export class ClothesService {
@@ -93,6 +96,46 @@ export class ClothesService {
       throw new BadRequestException('Error creating the clothes item');
     } finally {
       await queryRunner.release();
+    }
+  }
+
+  async createDraftClothe(
+    clothes: CreateDraftClothesDTO,
+  ): Promise<CreatedClothes> {
+    const { name, price } = clothes;
+    const newClothe = this.clothesRepository.create({
+      name,
+      price,
+      isDraft: true,
+      isInEcommerce: false,
+    });
+
+    const [gender, size] = await Promise.all([
+      this.genderRepository.findOne({
+        where: {
+          gender: Equal(CLOTHES_GENDER.UNISEX),
+        },
+      }),
+      this.sizeRepository.findOne({
+        where: {
+          size: Equal(CLOTHES_SIZES.M),
+        },
+      }),
+    ]);
+
+    try {
+      const savedClothe = await this.clothesRepository.save(newClothe);
+      const newVariant = this.variantsRepository.create({
+        clothesId: savedClothe.id,
+        additional: 0,
+        genderId: gender.id,
+        sizeId: size.id,
+      });
+      const savedVariant = await this.variantsRepository.save(newVariant);
+      return { ...savedClothe, variants: [savedVariant] };
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException('Error creating draft clothes item');
     }
   }
 
