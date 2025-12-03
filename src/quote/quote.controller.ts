@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   Put,
   Query,
@@ -62,5 +63,12 @@ export class QuoteController {
     @Body() dto: UpdateQuoteDTO,
   ): Promise<CreatedClothes> {
     return this.quoteService.updateQuote(id, dto);
+  }
+
+  @Patch(':id/cancel')
+  async cancelQuote(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<QuoteEntity> {
+    return this.quoteService.cancelQuote(id);
   }
 }
