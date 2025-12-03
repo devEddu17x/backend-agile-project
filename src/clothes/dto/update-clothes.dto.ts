@@ -23,4 +23,8 @@ export class UpdateClothesDTO {
   @IsOptional()
   @IsBoolean()
   isInEcommerce?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  isDraft?: boolean;
 }

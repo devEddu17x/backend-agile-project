@@ -229,14 +229,18 @@ export class ClothesService {
       throw new BadRequestException('No fields to update');
     }
 
-    if (clothe.isInEcommerce && updateData.isDraft === true) {
+    if (
+      clothe.isInEcommerce === true &&
+      updateData.isInEcommerce === true &&
+      updateData.isDraft === true
+    ) {
       throw new BadRequestException(
         'Cannot mark as draft a clothes item that is in the e-commerce',
       );
     }
 
     if (
-      clothe.isDraft &&
+      clothe.isDraft === true &&
       updateData.isDraft === false &&
       updateData.isInEcommerce === true
     ) {
