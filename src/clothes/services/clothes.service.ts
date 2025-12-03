@@ -35,7 +35,7 @@ export class ClothesService {
     private readonly storageService: StorageService,
   ) {}
 
-  async addNewClothesItem(clothes: CreateClothesDTO): Promise<CreatedClothes> {
+  async createClothe(clothes: CreateClothesDTO): Promise<CreatedClothes> {
     const { name, description, price, variants } = clothes;
 
     const variantKeys = new Set<string>();
