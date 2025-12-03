@@ -19,6 +19,13 @@ export class QuoteDetailEntity {
   @Column({ type: 'int', nullable: false, default: 1 })
   quantity: number;
 
+  @Column({ type: 'jsonb', nullable: true })
+  customizations: Array<{
+    name?: string;
+    number?: number;
+    notes?: string;
+  }>;
+
   @Column('uuid', { name: 'quote_id' })
   quoteId: string;
 
