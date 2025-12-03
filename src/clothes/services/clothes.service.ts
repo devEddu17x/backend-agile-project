@@ -149,6 +149,8 @@ export class ClothesService {
           'clothes.name',
           'clothes.description',
           'clothes.price',
+          'clothes.isDraft',
+          'clothes.isInEcommerce',
           'image.url',
         ])
         .getMany();
