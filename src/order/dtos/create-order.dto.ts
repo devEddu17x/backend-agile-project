@@ -7,6 +7,7 @@ import {
   MaxLength,
   ValidateNested,
 } from 'class-validator';
+import { IsValidDeliveryDate } from '../validators/delivery-date.validator';
 
 export class AddressDTO {
   @IsNotEmpty()
@@ -43,5 +44,6 @@ export class CreateOrderDTO {
 
   @IsNotEmpty()
   @IsDateString({}, { message: 'deliveryDate must be a valid date' })
+  @IsValidDeliveryDate()
   deliveryDate: string;
 }
