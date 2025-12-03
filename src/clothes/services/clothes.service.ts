@@ -324,4 +324,24 @@ export class ClothesService {
       throw new BadRequestException('Error searching and filtering clothes');
     }
   }
+
+  async checkIfClothesAreDraft(clothesIds: string[]): Promise<{
+    hasDrafts: boolean;
+    draftClothes: Array<{ id: string; name: string }>;
+  }> {
+    try {
+      const clothes = await this.clothesRepository.find({
+        where: { id: In(clothesIds), isDraft: true },
+        select: ['id', 'name'],
+      });
+
+      return {
+        hasDrafts: clothes.length > 0,
+        draftClothes: clothes.map((c) => ({ id: c.id, name: c.name })),
+      };
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException('Error checking draft clothes');
+    }
+  }
 }
