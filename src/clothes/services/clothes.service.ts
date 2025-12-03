@@ -260,6 +260,7 @@ export class ClothesService {
           'clothes.description',
           'clothes.price',
           'clothes.isInEcommerce',
+          'clothes.isDraft',
           'variant.id',
           'variant.additional',
           'size.size',
