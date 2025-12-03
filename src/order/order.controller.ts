@@ -15,6 +15,7 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { ROLES } from 'src/auth/constants/roles';
 import { UpdateOrderDTO } from './dtos/update-order.dto';
+import { CancelOrderDTO } from './dtos/cancel-order.dto';
 
 @Roles(ROLES.SELLER)
 @UseGuards(SuperTokensAuthGuard, RolesGuard)
@@ -43,5 +44,13 @@ export class OrderController {
     @Body() dto: UpdateOrderDTO,
   ) {
     return await this.orderService.updateOrderStatus(id, dto.status);
+  }
+
+  @Patch(':id/cancel')
+  async cancelOrder(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: CancelOrderDTO,
+  ) {
+    return await this.orderService.cancelOrder(id, dto.reason);
   }
 }
