@@ -133,23 +133,30 @@ export class QuoteService {
     return this.fetchQuotes(status);
   }
 
-  async updateQuote(dto: UpdateQuoteDTO): Promise<CreatedClothes> {
+  async updateQuote(id: string, dto: UpdateQuoteDTO): Promise<CreatedClothes> {
     this.validateCustomizations(dto.details);
+    this.validateNoDuplicateVariants(dto.details);
 
-    // Verificar que la cotización existe
     const existingQuote = await this.quoteRepository.findOne({
-      where: { id: dto.id },
+      where: { id },
       relations: ['customer'],
     });
 
     if (!existingQuote) {
-      throw new NotFoundException(`Quote with ID ${dto.id} not found`);
+      throw new NotFoundException(`Quote with ID ${id} not found`);
+    }
+
+    if (existingQuote.status !== QuoteStatus.PENDING) {
+      throw new BadRequestException(
+        'Only PENDING quotes can be edited. Current status: ' +
+          existingQuote.status,
+      );
     }
 
     // Calcular precios de las nuevas variantes (reutiliza lógica de createQuote)
     const variantsPrice = await this.getDetailUnitPrice({
       details: dto.details,
-      customerId: existingQuote.customerId, // Necesario para la validación
+      customerId: existingQuote.customerId,
     } as CreateQuoteDTO);
 
     const newTotal = this.calculateTotal(variantsPrice);
@@ -161,13 +168,13 @@ export class QuoteService {
 
       // 1. Eliminar todos los detalles existentes
       await queryRunner.manager.delete(QuoteDetailEntity, {
-        quoteId: dto.id,
+        quoteId: id,
       });
 
       // 2. Actualizar el total de la cotización
       await queryRunner.manager.update(
         QuoteEntity,
-        { id: dto.id },
+        { id },
         { total: newTotal },
       );
 
@@ -179,7 +186,7 @@ export class QuoteService {
         );
 
         return this.quoteDetailRepository.create({
-          quoteId: dto.id,
+          quoteId: id,
           unitPrice: vp.unitPrice,
           quantity: vp.quantity,
           clothesVariantId: vp.variantId,
@@ -196,7 +203,7 @@ export class QuoteService {
 
       // 4. Obtener la cotización actualizada con todos sus datos
       const updatedQuote = await this.quoteRepository.findOne({
-        where: { id: dto.id },
+        where: { id },
       });
 
       return { ...updatedQuote, details: savedDetails };
@@ -367,6 +374,26 @@ export class QuoteService {
           );
         }
       }
+    }
+  }
+
+  /**
+   * Validates that there are no duplicate variant IDs in quote details
+   * @param details - Array of quote details to validate
+   * @throws BadRequestException if duplicate variants are found
+   */
+  private validateNoDuplicateVariants(details: QuoteDetailDTO[]): void {
+    const variantIds = details.map((d) => d.clothesVariantId);
+    const uniqueVariantIds = new Set(variantIds);
+
+    if (variantIds.length !== uniqueVariantIds.size) {
+      // Find the duplicate variant IDs
+      const duplicates = variantIds.filter(
+        (id, index) => variantIds.indexOf(id) !== index,
+      );
+      throw new BadRequestException(
+        `Duplicate variant IDs found in quote details: ${[...new Set(duplicates)].join(', ')}. Each variant can only appear once.`,
+      );
     }
   }
 }
