@@ -13,6 +13,7 @@ import { QuoteService } from 'src/quote/quote.service';
 import { QuoteStatus } from 'src/quote/enums/status.enum';
 import { OrderSummary } from './interfaces/order-summary.interface';
 import { OrderStatus } from './enum/order-status.enum';
+import { ClothesService } from 'src/clothes/services/clothes.service';
 
 @Injectable()
 export class OrderService {
@@ -23,9 +24,30 @@ export class OrderService {
     private readonly addressRepository: Repository<AddressEntity>,
     private readonly dataSource: DataSource,
     private readonly quoteService: QuoteService,
+    private readonly clothesService: ClothesService,
   ) {}
 
   async createOrder(dto: CreateOrderDTO): Promise<OrderEntity> {
+    const quote = await this.quoteService.getQuoteById(dto.quoteId);
+
+    const clothesIds = [
+      ...new Set(
+        quote.details.map((detail) => detail.clothesVariant.clothesId),
+      ),
+    ];
+
+    const draftCheck =
+      await this.clothesService.checkIfClothesAreDraft(clothesIds);
+
+    if (draftCheck.hasDrafts) {
+      const draftNames = draftCheck.draftClothes
+        .map((c) => `"${c.name}"`)
+        .join(', ');
+      throw new BadRequestException(
+        `Cannot create order. The following clothes are still in draft mode and must be completed first: ${draftNames}`,
+      );
+    }
+
     const queryRunner = this.dataSource.createQueryRunner();
     try {
       await queryRunner.connect();
@@ -33,7 +55,6 @@ export class OrderService {
 
       const address = this.addressRepository.create(dto.address);
       const savedAddress = await queryRunner.manager.save(address);
-      const quote = await this.quoteService.getQuoteById(dto.quoteId);
       const order = this.orderRepository.create({
         quoteId: dto.quoteId,
         total: quote.total,
