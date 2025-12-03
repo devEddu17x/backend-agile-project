@@ -1,14 +1,6 @@
 import { Type } from 'class-transformer';
-import {
-  IsArray,
-  IsInt,
-  IsNotEmpty,
-  IsNumber,
-  IsString,
-  IsUUID,
-  Min,
-  ValidateNested,
-} from 'class-validator';
+import { IsArray, IsNotEmpty, IsUUID, ValidateNested } from 'class-validator';
+import { QuoteDetailDTO } from './create-quote.dto';
 
 export class UpdateQuoteDTO {
   @IsNotEmpty()
@@ -20,20 +12,4 @@ export class UpdateQuoteDTO {
   @ValidateNested({ each: true })
   @Type(() => QuoteDetailDTO)
   details: QuoteDetailDTO[];
-}
-
-export class QuoteDetailDTO {
-  @IsNotEmpty()
-  @IsString()
-  @IsUUID()
-  clothesVariantId: string;
-
-  @IsNotEmpty()
-  @IsNumber(
-    { allowNaN: false, allowInfinity: false },
-    { message: 'quantity must be a number' },
-  )
-  @IsInt({ message: 'quantity must be an integer' })
-  @Min(1, { message: 'quantity must be at least 1' })
-  quantity: number;
 }
