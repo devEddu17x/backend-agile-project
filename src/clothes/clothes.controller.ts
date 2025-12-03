@@ -26,6 +26,7 @@ import { AddImagesToClothesDTO } from './dto/add-images.dto';
 import { DeleteImageDTO } from './dto/delete-image.dto';
 import { ClothesVariantsService } from './services/clothes-variants.service';
 import { ClothesImagesService } from './services/clothes-images.service';
+import { CreateDraftClothesDTO } from './dto/create-draft-clothes.dto';
 
 @UseGuards(SuperTokensAuthGuard, RolesGuard)
 @Controller('clothes')
@@ -49,6 +50,32 @@ export class ClothesController {
       await this.storageService.createPresignedPuts(
         createdClothes.id,
         clothesDto.images,
+        { ttlSeconds: 3600, cacheControl: 'no-cache' },
+      );
+
+    const keys = preSignedPuts.map((put) => put.key);
+    const imageUrls = this.storageService.getImagesUrl(keys);
+    const savedImages = await this.clothesImagesService.addImagesToClothes(
+      createdClothes.id,
+      imageUrls,
+    );
+    if (!savedImages || savedImages.length === 0) {
+      throw new Error('Failed to save image URLs to the database');
+    }
+    return { ...createdClothes, preSignedPuts };
+  }
+  @Roles(ROLES.SELLER)
+  @Post('quick-create')
+  async createDraftClothes(
+    @Body() draftClothesDto: CreateDraftClothesDTO,
+  ): Promise<CreatedClothes & { preSignedPuts: PresignedPut[] }> {
+    const createdClothes: CreatedClothes =
+      await this.clothesService.createDraftClothe(draftClothesDto);
+
+    const preSignedPuts: PresignedPut[] | [] =
+      await this.storageService.createPresignedPuts(
+        createdClothes.id,
+        draftClothesDto.images,
         { ttlSeconds: 3600, cacheControl: 'no-cache' },
       );
 
