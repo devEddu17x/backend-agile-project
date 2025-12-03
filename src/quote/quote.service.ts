@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { QuoteEntity } from './entities/quote.entity';
 import { Repository } from 'typeorm/repository/Repository';
 import { QuoteDetailEntity } from './entities/quote-detail.entity';
-import { CreateQuoteDTO } from './dtos/create-quote.dto';
+import { CreateQuoteDTO, QuoteDetailDTO } from './dtos/create-quote.dto';
 import { CustomerService } from 'src/customer/customer.service';
 import { DataSource } from 'typeorm';
 import { ClothesService } from 'src/clothes/services/clothes.service';
@@ -32,6 +32,8 @@ export class QuoteService {
   ) {}
 
   async createQuote(dto: CreateQuoteDTO): Promise<CreatedClothes> {
+    this.validateCustomizations(dto.details);
+
     const customer = await this.customerService.getCustomerById(dto.customerId);
     const variantsPrice = await this.getDetailUnitPrice(dto);
     const total = this.calculateTotal(variantsPrice);
@@ -48,11 +50,17 @@ export class QuoteService {
       );
 
       const detailsToSave = variantsPrice.map((vp) => {
+        // Buscar las customizaciones correspondientes del DTO
+        const dtoDetail = dto.details.find(
+          (d) => d.clothesVariantId === vp.variantId,
+        );
+
         return this.quoteDetailRepository.create({
           quoteId: newQuote.id,
           unitPrice: vp.unitPrice,
           quantity: vp.quantity,
           clothesVariantId: vp.variantId,
+          customizations: dtoDetail?.customizations || [],
         });
       });
       const savedDetails = await queryRunner.manager.save(
@@ -126,6 +134,8 @@ export class QuoteService {
   }
 
   async updateQuote(dto: UpdateQuoteDTO): Promise<CreatedClothes> {
+    this.validateCustomizations(dto.details);
+
     // Verificar que la cotización existe
     const existingQuote = await this.quoteRepository.findOne({
       where: { id: dto.id },
@@ -163,11 +173,17 @@ export class QuoteService {
 
       // 3. Crear los nuevos detalles
       const newDetailsToSave = variantsPrice.map((vp) => {
+        // Buscar las customizaciones correspondientes del DTO
+        const dtoDetail = dto.details.find(
+          (d) => d.clothesVariantId === vp.variantId,
+        );
+
         return this.quoteDetailRepository.create({
           quoteId: dto.id,
           unitPrice: vp.unitPrice,
           quantity: vp.quantity,
           clothesVariantId: vp.variantId,
+          customizations: dtoDetail?.customizations || [],
         });
       });
 
@@ -335,5 +351,22 @@ export class QuoteService {
       total += unitPrice * vp.quantity;
     }
     return total;
+  }
+
+  /**
+   * Validates that customizations array does not exceed quantity
+   * @param details - Array of quote details to validate
+   * @throws BadRequestException if customizations exceed quantity
+   */
+  private validateCustomizations(details: QuoteDetailDTO[]): void {
+    for (const detail of details) {
+      if (detail.customizations && detail.customizations.length > 0) {
+        if (detail.customizations.length > detail.quantity) {
+          throw new BadRequestException(
+            `Detail for variant ${detail.clothesVariantId} has ${detail.customizations.length} customizations but quantity is only ${detail.quantity}. Customizations cannot exceed quantity.`,
+          );
+        }
+      }
+    }
   }
 }
