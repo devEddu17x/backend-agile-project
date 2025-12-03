@@ -30,6 +30,21 @@ export class OrderService {
   async createOrder(dto: CreateOrderDTO): Promise<OrderEntity> {
     const quote = await this.quoteService.getQuoteById(dto.quoteId);
 
+    if (quote.status === QuoteStatus.CANCELLED) {
+      throw new BadRequestException(
+        'Cannot create order from a cancelled quote',
+      );
+    }
+    if (quote.status === QuoteStatus.REJECTED) {
+      throw new BadRequestException(
+        'Cannot create order from a rejected quote',
+      );
+    }
+    if (quote.status === QuoteStatus.APPROVED) {
+      throw new BadRequestException(
+        'Cannot create order from a quote that was already approved',
+      );
+    }
     const clothesIds = [
       ...new Set(
         quote.details.map((detail) => detail.clothesVariant.clothesId),
@@ -61,7 +76,6 @@ export class OrderService {
         deliveryDate: new Date(dto.deliveryDate),
         address: savedAddress,
       });
-      console.log(order);
       const savedOrder = await queryRunner.manager.save(order);
       await this.quoteService.updateStatus(dto.quoteId, QuoteStatus.APPROVED);
       await queryRunner.commitTransaction();
