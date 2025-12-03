@@ -30,6 +30,9 @@ export class OrderEntity {
   @CreateDateColumn()
   createdAt: Date;
 
+  @Column({ type: 'text', name: 'cancellation_reason', nullable: true })
+  cancellationReason: string | null;
+
   @Column({ type: 'date', nullable: false })
   deliveryDate: Date;
 
