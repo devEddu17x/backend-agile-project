@@ -67,7 +67,6 @@ export function buildEmailPasswordRecipe(dependencies: {
           if (context.type === 'PASSWORD_RESET') {
             from = `${appInfo.appName} <reset-password@${emailConfig.from}>`;
             const passwordResetLink = context.passwordResetLink;
-            console.log('reset link', passwordResetLink);
             const toEmail = context.user.email;
             await transporter.sendMail({
               from: from,
