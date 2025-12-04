@@ -22,7 +22,7 @@ export class CustomerEcommerceService {
 
   async registerEcommerceUser(
     registerDTO: RegisterEcommerceUserDTO,
-  ): Promise<{ customer: CustomerEntity; sessionTokens: any }> {
+  ): Promise<CustomerEntity> {
     const { names, lastNames, email, password } = registerDTO;
 
     const existingCustomer = await this.customerRepository.findOne({
@@ -91,15 +91,7 @@ export class CustomerEcommerceService {
       throw new BadRequestException('Error assigning user permissions');
     }
 
-    const sessionTokens = {
-      userId: superTokensUserId,
-      email: email,
-    };
-
-    return {
-      customer,
-      sessionTokens,
-    };
+    return customer;
   }
 
   async getCustomerBySuperTokensId(
