@@ -10,9 +10,10 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { Session, SuperTokensAuthGuard } from 'supertokens-nestjs';
+import { SessionContainer } from 'supertokens-node/recipe/session';
 import { ClothesService } from './services/clothes.service';
 import { CreateClothesDTO } from './dto/create-clothes.dto';
-import { SuperTokensAuthGuard } from 'supertokens-nestjs';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { ROLES } from 'src/auth/constants/roles';
@@ -27,8 +28,9 @@ import { DeleteImageDTO } from './dto/delete-image.dto';
 import { ClothesVariantsService } from './services/clothes-variants.service';
 import { ClothesImagesService } from './services/clothes-images.service';
 import { CreateDraftClothesDTO } from './dto/create-draft-clothes.dto';
+import { UserContext } from 'src/auth/helpers/user-context.helper';
+import { OptionalAuthGuard } from 'src/auth/guards/optional-auth.guard';
 
-@UseGuards(SuperTokensAuthGuard, RolesGuard)
 @Controller('clothes')
 export class ClothesController {
   constructor(
@@ -38,6 +40,7 @@ export class ClothesController {
     private readonly storageService: StorageService,
   ) {}
 
+  @UseGuards(SuperTokensAuthGuard, RolesGuard)
   @Roles(ROLES.ADMIN)
   @Post()
   async createClothes(
@@ -64,6 +67,8 @@ export class ClothesController {
     }
     return { ...createdClothes, preSignedPuts };
   }
+
+  @UseGuards(SuperTokensAuthGuard, RolesGuard)
   @Roles(ROLES.SELLER)
   @Post('quick-create')
   async createDraftClothes(
@@ -91,33 +96,46 @@ export class ClothesController {
     return { ...createdClothes, preSignedPuts };
   }
 
+  @UseGuards(OptionalAuthGuard)
   @Get()
-  async getAllClothes(): Promise<any> {
-    return this.clothesService.getAllClothes();
+  async getAllClothes(@Session() session?: SessionContainer): Promise<any> {
+    const userContext = new UserContext(session);
+    const filters = await userContext.getClothesFilterOptions();
+    return this.clothesService.getAllClothes(filters);
   }
 
+  @UseGuards(OptionalAuthGuard)
   @Get('search')
   async searchAndFilterClothes(
     @Query('name') name?: string,
     @Query('description') description?: string,
     @Query('size') size?: string,
     @Query('gender') gender?: string,
+    @Session() session?: SessionContainer,
   ): Promise<any> {
+    const userContext = new UserContext(session);
+    const filters = await userContext.getClothesFilterOptions();
     return this.clothesService.searchAndFilterClothes(
       name,
       description,
       size,
       gender,
+      filters,
     );
   }
 
+  @UseGuards(OptionalAuthGuard)
   @Get(':id')
   async getClothesById(
     @Param('id', ParseUUIDPipe) clothesId: string,
+    @Session() session?: SessionContainer,
   ): Promise<any> {
-    return this.clothesService.getClothesById(clothesId);
+    const userContext = new UserContext(session);
+    const filters = await userContext.getClothesFilterOptions();
+    return this.clothesService.getClothesById(clothesId, filters);
   }
 
+  @UseGuards(SuperTokensAuthGuard, RolesGuard)
   @Roles(ROLES.ADMIN)
   @Patch(':id')
   async updateClothes(
@@ -127,6 +145,7 @@ export class ClothesController {
     return this.clothesService.updateClothes(clothesId, updateClothesDto);
   }
 
+  @UseGuards(SuperTokensAuthGuard, RolesGuard)
   @Roles(ROLES.ADMIN)
   @Post(':id/variants')
   async addVariant(
@@ -139,6 +158,7 @@ export class ClothesController {
     );
   }
 
+  @UseGuards(SuperTokensAuthGuard, RolesGuard)
   @Roles(ROLES.ADMIN)
   @Patch(':id/variants/:variantId')
   async updateVariant(
@@ -153,6 +173,7 @@ export class ClothesController {
     );
   }
 
+  @UseGuards(SuperTokensAuthGuard, RolesGuard)
   @Roles(ROLES.ADMIN)
   @Delete(':id/variants/:variantId')
   async deleteVariant(
@@ -162,6 +183,7 @@ export class ClothesController {
     return this.clothesVariantService.deleteVariant(clothesId, variantId);
   }
 
+  @UseGuards(SuperTokensAuthGuard, RolesGuard)
   @Roles(ROLES.ADMIN)
   @Post(':id/images')
   async addImages(
@@ -174,6 +196,7 @@ export class ClothesController {
     );
   }
 
+  @UseGuards(SuperTokensAuthGuard, RolesGuard)
   @Roles(ROLES.ADMIN)
   @Delete(':id/images')
   async deleteImage(
