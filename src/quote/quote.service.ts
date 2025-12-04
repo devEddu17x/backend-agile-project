@@ -8,7 +8,7 @@ import { QuoteEntity } from './entities/quote.entity';
 import { Repository } from 'typeorm/repository/Repository';
 import { QuoteDetailEntity } from './entities/quote-detail.entity';
 import { CreateQuoteDTO, QuoteDetailDTO } from './dtos/create-quote.dto';
-import { CustomerService } from 'src/customer/customer.service';
+import { CustomerService } from 'src/customer/services/customer-internal.service';
 import { DataSource } from 'typeorm';
 import { ClothesService } from 'src/clothes/services/clothes.service';
 import { ClothesPrice } from './interfaces/clothes-price.interface';
