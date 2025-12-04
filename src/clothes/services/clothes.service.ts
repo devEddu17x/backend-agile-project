@@ -18,6 +18,7 @@ import { StorageService } from 'src/storage/storage.service';
 import { CreateDraftClothesDTO } from '../dto/create-draft-clothes.dto';
 import { CLOTHES_GENDER } from '../enum/gender.enum';
 import { CLOTHES_SIZES } from '../enum/size.enum';
+import { ClothesFilterOptions } from 'src/auth/helpers/user-context.helper';
 
 @Injectable()
 export class ClothesService {
@@ -139,9 +140,9 @@ export class ClothesService {
     }
   }
 
-  async getAllClothes(): Promise<any> {
+  async getAllClothes(filterOptions?: ClothesFilterOptions): Promise<any> {
     try {
-      const clothes = await this.clothesRepository
+      const queryBuilder = this.clothesRepository
         .createQueryBuilder('clothes')
         .leftJoinAndSelect('clothes.clothe_image', 'image')
         .select([
@@ -152,8 +153,20 @@ export class ClothesService {
           'clothes.isDraft',
           'clothes.isInEcommerce',
           'image.url',
-        ])
-        .getMany();
+        ]);
+
+      if (filterOptions?.isInEcommerce !== undefined) {
+        queryBuilder.andWhere('clothes.isInEcommerce = :isInEcommerce', {
+          isInEcommerce: filterOptions.isInEcommerce,
+        });
+      }
+
+      if (filterOptions?.isDraft !== undefined) {
+        queryBuilder.andWhere('clothes.isDraft = :isDraft', {
+          isDraft: filterOptions.isDraft,
+        });
+      }
+      const clothes = await queryBuilder.getMany();
       return clothes;
     } catch (error) {
       console.log(error);
@@ -161,10 +174,13 @@ export class ClothesService {
     }
   }
 
-  async getClothesById(clothesId: string): Promise<any> {
+  async getClothesById(
+    clothesId: string,
+    filterOptions?: ClothesFilterOptions,
+  ): Promise<any> {
     let clothe = null;
     try {
-      clothe = await this.clothesRepository
+      const queryBuilder = this.clothesRepository
         .createQueryBuilder('clothes')
         .leftJoinAndSelect('clothes.clothes_variant', 'variant')
         .leftJoinAndSelect('variant.size', 'size')
@@ -189,8 +205,21 @@ export class ClothesService {
 
           'image.url',
         ])
-        .where('clothes.id = :clothesId', { clothesId })
-        .getOne();
+        .where('clothes.id = :clothesId', { clothesId });
+
+      if (filterOptions?.isInEcommerce !== undefined) {
+        queryBuilder.andWhere('clothes.isInEcommerce = :isInEcommerce', {
+          isInEcommerce: filterOptions.isInEcommerce,
+        });
+      }
+
+      if (filterOptions?.isDraft !== undefined) {
+        queryBuilder.andWhere('clothes.isDraft = :isDraft', {
+          isDraft: filterOptions.isDraft,
+        });
+      }
+
+      clothe = await queryBuilder.getOne();
     } catch (error) {
       console.log(error);
       throw new BadRequestException('Error fetching the clothes item');
@@ -246,6 +275,7 @@ export class ClothesService {
     description?: string,
     size?: string,
     gender?: string,
+    filterOptions?: ClothesFilterOptions,
   ): Promise<any[]> {
     try {
       let query = this.clothesRepository
@@ -314,6 +344,18 @@ export class ClothesService {
           });
           hasCondition = true;
         }
+      }
+
+      if (filterOptions?.isInEcommerce !== undefined) {
+        query = query.andWhere('clothes.isInEcommerce = :isInEcommerce', {
+          isInEcommerce: filterOptions.isInEcommerce,
+        });
+      }
+
+      if (filterOptions?.isDraft !== undefined) {
+        query = query.andWhere('clothes.isDraft = :isDraft', {
+          isDraft: filterOptions.isDraft,
+        });
       }
 
       const clothes = await query.getMany();
