@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { AllowedImagesDTO } from '../dto/images.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { QuoteDetailEntity } from 'src/quote/entities/quote-detail.entity';
 import { StorageService } from 'src/storage/storage.service';
 import { Repository } from 'typeorm';
 import { ClotheImageEntity } from '../entities/images.entity';
@@ -18,7 +17,6 @@ export class ClothesImagesService {
     private readonly clothesRepository: Repository<ClothesEntity>,
     @InjectRepository(ClotheImageEntity)
     private readonly imageRepository: Repository<ClotheImageEntity>,
-    @InjectRepository(QuoteDetailEntity)
     private readonly storageService: StorageService,
   ) {}
   async addNewImagesToClothes(
