@@ -22,7 +22,7 @@ export class CustomerEntity {
   @Column({ type: 'varchar', length: 100, nullable: true })
   reference: string;
 
-  @Column({ type: 'varchar', length: 20, nullable: true }) // Ahora nullable para usuarios e-commerce
+  @Column({ type: 'varchar', length: 20, nullable: true })
   phone: string;
 
   @Column({ type: 'varchar', length: 255, unique: true, nullable: true })
