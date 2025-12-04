@@ -12,6 +12,7 @@ import { AdminModule } from './admin/admin.module';
 import { StorageModule } from './storage/storage.module';
 import { QuoteModule } from './quote/quote.module';
 import { OrderModule } from './order/order.module';
+import { CartModule } from './cart/cart.module';
 import { LoggerModule } from 'nestjs-pino';
 
 @Module({
@@ -37,6 +38,7 @@ import { LoggerModule } from 'nestjs-pino';
     StorageModule,
     QuoteModule,
     OrderModule,
+    CartModule,
   ],
 
   controllers: [AppController],
