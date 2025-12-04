@@ -11,7 +11,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { CustomerService } from './customer.service';
+import { CustomerService } from './services/customer-internal.service';
 import { CreateCustomerDTO } from './dtos/create-customer.dto';
 import { SuperTokensAuthGuard } from 'supertokens-nestjs';
 import { ROLES } from 'src/auth/constants/roles';
