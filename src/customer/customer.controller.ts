@@ -20,40 +20,31 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { CustomerEntity } from './entities/customer.entity';
 import { UpdateCustomerDTO } from './dtos/update-customer.dto';
 import { RegisterEcommerceUserDTO } from './dtos/register-ecommerce-user.dto';
+import { CustomerEcommerceService } from './services/customer-ecommerce.service';
 
 @Controller('customers')
 export class CustomerController {
-  constructor(private readonly customerService: CustomerService) {}
+  constructor(
+    private readonly customerService: CustomerService,
+    private readonly customerEcommerceService: CustomerEcommerceService,
+  ) {}
 
-  // === ENDPOINTS PÚBLICOS (E-COMMERCE) ===
-
-  /**
-   * Registro de usuario e-commerce
-   * POST /api/v1/customers/register
-   */
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   async registerEcommerceUser(@Body() registerDTO: RegisterEcommerceUserDTO) {
-    const result =
-      await this.customerService.registerEcommerceUser(registerDTO);
+    const customer =
+      await this.customerEcommerceService.registerEcommerceUser(registerDTO);
 
     return {
       message: 'Usuario registrado exitosamente',
       customer: {
-        id: result.customer.id,
-        names: result.customer.names,
-        lastNames: result.customer.lastNames,
-        email: result.customer.email,
-      },
-      // El frontend usará estos datos para iniciar sesión automáticamente
-      auth: {
-        email: result.customer.email,
-        // No devolvemos el password, el frontend debe llamar a /auth/signin
+        id: customer.id,
+        names: customer.names,
+        lastNames: customer.lastNames,
+        email: customer.email,
       },
     };
   }
-
-  // === ENDPOINTS PROTEGIDOS (EMPLEADOS) ===
 
   @Roles(ROLES.SELLER)
   @UseGuards(SuperTokensAuthGuard, RolesGuard)
