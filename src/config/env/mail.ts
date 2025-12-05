@@ -29,15 +29,6 @@ export default registerAs('email', () => {
         user: EMAIL_USER,
         pass: EMAIL_PASS,
       },
-      connectionTimeout: 60000, // 60 segundos
-      greetingTimeout: 30000, // 30 segundos
-      socketTimeout: 60000, // 60 segundos
-      // Habilitar STARTTLS para puerto 587
-      requireTLS: EMAIL_PORT === '587',
-      tls: {
-        // No fallar en certificados auto-firmados (útil para desarrollo)
-        rejectUnauthorized: process.env.NODE_ENV === 'production',
-      },
     },
     from: EMAIL_FROM,
   };
