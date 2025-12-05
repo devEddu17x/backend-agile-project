@@ -3,6 +3,7 @@ import {
   IsNumber,
   IsNotEmpty,
   Min,
+  Max,
   IsArray,
   ValidateNested,
   IsOptional,
@@ -21,8 +22,12 @@ export class CreateClothesDTO {
   description: string;
 
   @IsNotEmpty()
-  @IsNumber()
-  @Min(0)
+  @IsNumber(
+    { maxDecimalPlaces: 2 },
+    { message: 'Price must have at most 2 decimal places' },
+  )
+  @Min(0, { message: 'Price must be greater than or equal to 0' })
+  @Max(1000, { message: 'Price must be less than or equal to 1000' })
   price: number;
 
   @IsNotEmpty()
