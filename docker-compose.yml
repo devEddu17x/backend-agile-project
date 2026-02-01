@@ -1,6 +1,4 @@
 services:
-  # Note: If you are assigning a custom name to your db service on the line below, make sure it does not contain underscores
-
   # application database
   app_db:
     image: 'postgres:latest'
