@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { PromoteEmployeeDTO } from './dtos/promote-employee.dto';
+import { EmployeeRoleUpdateDTO } from './dtos/promote-employee.dto';
 import { SuperTokensAuthGuard } from 'supertokens-nestjs';
 import { ROLES } from 'src/auth/constants/roles';
 import { CreateEmployeeDTO } from 'src/employee/dtos/create-employee.dto';
@@ -27,18 +27,18 @@ export class AdminController {
   }
 
   @Patch('employees/promote')
-  async promoteEmployeeRole(@Body() promoteEmployeeDTO: PromoteEmployeeDTO) {
+  async promoteEmployeeRole(@Body() roleUpdate: EmployeeRoleUpdateDTO) {
     return await this.adminService.updateEmployeeRole(
-      promoteEmployeeDTO.email,
-      promoteEmployeeDTO.role,
+      roleUpdate.email,
+      roleUpdate.role,
     );
   }
 
   @Patch('employees/revoke')
-  async revokeEmployeeRole(@Body() promoteEmployeeDTO: PromoteEmployeeDTO) {
+  async revokeEmployeeRole(@Body() roleUpdate: EmployeeRoleUpdateDTO) {
     return await this.adminService.revokeEmployeeRole(
-      promoteEmployeeDTO.email,
-      promoteEmployeeDTO.role,
+      roleUpdate.email,
+      roleUpdate.role,
     );
   }
 

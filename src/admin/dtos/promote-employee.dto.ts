@@ -1,7 +1,7 @@
 import { IsEmail, IsEnum, IsNotEmpty } from 'class-validator';
 import { ROLES } from 'src/auth/constants/roles';
 
-export class PromoteEmployeeDTO {
+export class EmployeeRoleUpdateDTO {
   @IsNotEmpty()
   @IsEmail()
   email: string;
