@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  postgres-test:
+    image: postgres:15
+    container_name: postgres-test-db
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+      POSTGRES_DB: test_db
+    ports:
+      - '5434:5432' # Puerto diferente para no chocar con tu BD principal
+    volumes:
+      - postgres-test-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U test_user -d test_db']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  supertokens-test:
+    image: registry.supertokens.io/supertokens/supertokens-postgresql:latest
+    container_name: supertokens-test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+    ports:
+      - '3568:3567' # Puerto diferente
+    environment:
+      POSTGRESQL_CONNECTION_URI: 'postgresql://test_user:test_password@postgres-test:5432/test_db'
+      API_KEYS: test_api_key
+
+volumes:
+  postgres-test-data:

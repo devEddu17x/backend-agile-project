@@ -1,0 +1,17 @@
+export enum CLOTHES_SIZES {
+  TALLA_2 = '2',
+  TALLA_4 = '4',
+  TALLA_6 = '6',
+  TALLA_8 = '8',
+  TALLA_10 = '10',
+  TALLA_12 = '12',
+  TALLA_14 = '14',
+  TALLA_16 = '16',
+  XS = 'XS',
+  S = 'S',
+  M = 'M',
+  L = 'L',
+  XL = 'XL',
+  XXL = 'XXL',
+  XXXL = 'XXXL',
+}
